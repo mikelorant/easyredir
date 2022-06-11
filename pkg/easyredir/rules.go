@@ -36,9 +36,9 @@ type Links struct {
 }
 
 type RulesOptions struct {
-	sourceFilter	string
-	targetFilter	string
-	limit			int
+	sourceFilter string
+	targetFilter string
+	limit        int
 }
 
 func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) {

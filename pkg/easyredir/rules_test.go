@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockClient struct{
-	filename	string
+type mockClient struct {
+	filename string
 }
 
 func (m *mockClient) sendRequest(baseURL, path, method string, body io.Reader) (io.Reader, error) {

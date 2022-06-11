@@ -6,7 +6,7 @@ import (
 
 func Run() error {
 	e := easyredir.New(&easyredir.Config{
-		Key: "key",
+		Key:    "key",
 		Secret: "secret",
 	})
 	e.Ping()

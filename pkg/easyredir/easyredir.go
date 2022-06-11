@@ -21,9 +21,9 @@ type Client struct {
 }
 
 type Config struct {
-	BaseURL	string
-	Key    	string
-	Secret 	string
+	BaseURL string
+	Key     string
+	Secret  string
 }
 
 func New(cfg *Config) *Easyredir {
