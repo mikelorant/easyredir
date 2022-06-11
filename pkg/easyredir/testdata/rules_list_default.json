@@ -1,0 +1,25 @@
+{
+  "data": [
+    {
+      "id": "abc-def",
+      "type": "rule",
+      "attributes": {
+        "forward_params": true,
+        "forward_path": true,
+        "response_type": "moved_permanently",
+        "source_urls": [
+          "abc.com",
+          "abc.com/123"
+        ],
+        "target_url": "otherdomain.com"
+      }
+    }
+  ],
+  "meta": {
+    "has_more": true
+  },
+  "links": {
+    "next": "/v1/rules?starting_after=abc-def",
+    "prev": "/v1/rules?ending_before=abc-def"
+  }
+}
