@@ -5,10 +5,7 @@ import (
 )
 
 func Run() error {
-	e := easyredir.New(&easyredir.Config{
-		Key:    "key",
-		Secret: "secret",
-	})
+	e := easyredir.New(&easyredir.Config{})
 	e.Ping()
 
 	return nil

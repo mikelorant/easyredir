@@ -15,7 +15,7 @@ type mockClient struct {
 	filename string
 }
 
-func (m *mockClient) sendRequest(baseURL, path, method string, body io.Reader) (io.Reader, error) {
+func (m *mockClient) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	fh, err := os.Open(m.filename)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read file: %w", err)

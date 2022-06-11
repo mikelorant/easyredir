@@ -13,7 +13,7 @@ type Easyredir struct {
 }
 
 type ClientAPI interface {
-	sendRequest(baseURL, path, method string, body io.Reader) (io.Reader, error)
+	sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
 type Client struct {
@@ -39,15 +39,16 @@ func (c *Easyredir) Ping() string {
 	return "pong"
 }
 
-func decodeJSON(r io.Reader, v interface{}) error {
+func decodeJSON(r io.ReadCloser, v interface{}) error {
 	if err := json.NewDecoder(r).Decode(&v); err != nil {
 		return fmt.Errorf("unable to json decode: %w", err)
 	}
+	r.Close()
 
 	return nil
 }
 
-func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.Reader, error) {
+func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	url := fmt.Sprintf("%v%v", baseURL, path)
 
 	req, err := http.NewRequest(method, url, body)

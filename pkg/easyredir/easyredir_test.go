@@ -105,7 +105,7 @@ func TestDecodeJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := Data{}
-			err := decodeJSON(tt.args.src, &got)
+			err := decodeJSON(io.NopCloser(tt.args.src), &got)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
