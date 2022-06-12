@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"testing"
 
@@ -14,15 +13,13 @@ import (
 )
 
 type mockClient struct {
-	filename string
+	data string
 }
 
 func (m *mockClient) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
-	fh, err := os.Open(m.filename)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read file: %w", err)
-	}
-	return fh, nil
+	r := strings.NewReader(m.data)
+	rc := io.NopCloser(r)
+	return rc, nil
 }
 
 func TestListRules(t *testing.T) {
@@ -31,7 +28,7 @@ func TestListRules(t *testing.T) {
 	}
 
 	type Fields struct {
-		filename string
+		data string
 	}
 
 	type Want struct {
@@ -48,7 +45,33 @@ func TestListRules(t *testing.T) {
 		{
 			name: "default",
 			fields: Fields{
-				filename: "testdata/rules_list_default.json",
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule",
+					      "attributes": {
+					        "forward_params": true,
+					        "forward_path": true,
+					        "response_type": "moved_permanently",
+					        "source_urls": [
+					          "abc.com",
+					          "abc.com/123"
+					        ],
+					        "target_url": "otherdomain.com"
+					      }
+					    }
+					  ],
+					  "meta": {
+					    "has_more": true
+					  },
+					  "links": {
+					    "next": "/v1/rules?starting_after=abc-def",
+					    "prev": "/v1/rules?ending_before=abc-def"
+					  }
+					}
+				`,
 			},
 			want: Want{
 				rules: Rules{
@@ -85,7 +108,16 @@ func TestListRules(t *testing.T) {
 				},
 			},
 			fields: Fields{
-				filename: "testdata/rules_list_minimal.json",
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
 			},
 			want: Want{
 				rules: Rules{
@@ -105,7 +137,16 @@ func TestListRules(t *testing.T) {
 				},
 			},
 			fields: Fields{
-				filename: "testdata/rules_list_minimal.json",
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
 			},
 			want: Want{
 				rules: Rules{
@@ -126,7 +167,16 @@ func TestListRules(t *testing.T) {
 				},
 			},
 			fields: Fields{
-				filename: "testdata/rules_list_minimal.json",
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
 			},
 			want: Want{
 				rules: Rules{
@@ -146,7 +196,16 @@ func TestListRules(t *testing.T) {
 				},
 			},
 			fields: Fields{
-				filename: "testdata/rules_list_minimal.json",
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
 			},
 			want: Want{
 				rules: Rules{
@@ -161,7 +220,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "error_invalid_json",
 			fields: Fields{
-				filename: "testdata/rules_list_invalid.json",
+				data: "notjson",
 			},
 			want: Want{
 				rules: Rules{
@@ -176,7 +235,7 @@ func TestListRules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Easyredir{
 				client: &mockClient{
-					filename: tt.fields.filename,
+					data: tt.fields.data,
 				},
 				config: &Config{},
 			}
