@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/ghodss/yaml"
 )
 
 type Rules struct {
@@ -14,9 +16,10 @@ type Rules struct {
 }
 
 type RuleData struct {
-	ID         *string        `json:"id"`
-	Type       *string        `json:"type"`
-	Attributes RuleAttributes `json:"attributes"`
+	ID            *string        `json:"id"`
+	Type          *string        `json:"type"`
+	Attributes    RuleAttributes `json:"attributes"`
+	Relationships Relationships  `json:"relationships"`
 }
 
 type RuleAttributes struct {
@@ -25,6 +28,24 @@ type RuleAttributes struct {
 	ResponseType  *string   `json:"response_type"`
 	SourceURLs    []*string `json:"source_urls"`
 	TargetURL     *string   `json:"target_url"`
+}
+
+type Relationships struct {
+	SourceHosts SourceHosts `json:"source_hosts"`
+}
+
+type SourceHosts struct {
+	Data  []SourceHostData `json:"data"`
+	Links SourceHostsLinks `json:"links"`
+}
+
+type SourceHostData struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
+type SourceHostsLinks struct {
+	Related string `json:"related"`
 }
 
 type Metadata struct {
@@ -144,4 +165,17 @@ func listRulesPathQuery(opts *RulesOptions) string {
 	}
 
 	return sb.String()
+}
+
+func (r RuleData) String() string {
+	y, _ := yaml.Marshal(r)
+	return fmt.Sprint(string(y))
+}
+
+func (r Rules) String() string {
+	ss := []string{}
+	for _, v := range r.Data {
+		ss = append(ss, fmt.Sprint(v))
+	}
+	return strings.Join(ss, "\n")
 }
