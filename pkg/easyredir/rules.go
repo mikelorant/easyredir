@@ -175,8 +175,11 @@ func (r RuleData) String() string {
 
 func (r Rules) String() string {
 	ss := []string{}
+	i := 0
 	for _, v := range r.Data {
 		ss = append(ss, fmt.Sprint(v))
+		i++
 	}
+	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
 	return strings.Join(ss, "\n")
 }
