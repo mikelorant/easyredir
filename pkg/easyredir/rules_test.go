@@ -1,9 +1,11 @@
 package easyredir
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gotidy/ptr"
@@ -300,6 +302,164 @@ func TestListRulesPathQuery(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := listRulesPathQuery(tt.args.options)
 			td.Cmp(t, got, tt.want.pathQuery)
+		})
+	}
+}
+
+type mockPaginatorClient struct {
+	idx  int
+	data string
+}
+
+func (m *mockPaginatorClient) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+	data := strings.NewReader(m.data)
+	docs := make(map[int]interface{})
+	dec := json.NewDecoder(data)
+
+	i := 0
+	for {
+		var doc map[string]interface{}
+		err := dec.Decode(&doc)
+		if err == io.EOF {
+			break
+		}
+		if err != nil && err != io.EOF {
+			return nil, fmt.Errorf("unable to decode json page %v: %w", i, err)
+		}
+		docs[i] = doc
+		i++
+	}
+
+	b, err := json.Marshal(docs[m.idx])
+	if err != nil {
+		return nil, fmt.Errorf("unable to encode json page %v: %w", i, err)
+	}
+
+	r := strings.NewReader(string(b))
+	rc := io.NopCloser(r)
+
+	m.idx++
+
+	return rc, nil
+}
+
+func TestListRulesPaginator(t *testing.T) {
+	type Args struct {
+		options []func(*RulesOptions)
+	}
+
+	type Fields struct {
+		data string
+	}
+
+	type Want struct {
+		rules Rules
+		err   string
+	}
+
+	tests := []struct {
+		name   string
+		args   Args
+		fields Fields
+		want   Want
+	}{
+		{
+			name: "one",
+			fields: Fields{
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
+			},
+			want: Want{
+				rules: Rules{
+					Data: []RuleData{
+						{
+							ID:   ptr.String("abc-def"),
+							Type: ptr.String("rule"),
+						},
+					},
+					Metadata: Metadata{
+						HasMore: false,
+					},
+				},
+			},
+		},
+		{
+			name: "many",
+			fields: Fields{
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ],
+					  "meta": {
+						  "has_more": true
+					  },
+					  "links": {
+						  "next": "2"
+					  }
+					}
+					{
+					  "data": [
+					    {
+					      "id": "bcd-efg",
+					      "type": "rule"
+					    }
+					  ]
+					}
+				`,
+			},
+			want: Want{
+				rules: Rules{
+					Data: []RuleData{
+						{
+							ID:   ptr.String("abc-def"),
+							Type: ptr.String("rule"),
+						}, {
+							ID:   ptr.String("bcd-efg"),
+							Type: ptr.String("rule"),
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "none",
+			want: Want{
+				rules: Rules{
+					Data: []RuleData{},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &Easyredir{
+				client: &mockPaginatorClient{
+					data: tt.fields.data,
+				},
+				config: &Config{},
+			}
+
+			got, err := e.ListRulesPaginator(tt.args.options...)
+			if tt.want.err != "" {
+				assert.NotNil(t, err)
+				td.CmpContains(t, err, tt.want.err)
+				return
+			}
+			assert.Nil(t, err)
+			td.Cmp(t, got, tt.want.rules)
 		})
 	}
 }
