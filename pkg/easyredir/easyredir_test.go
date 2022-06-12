@@ -139,8 +139,7 @@ func TestSendRequest(t *testing.T) {
 			want: Want{
 				body: "payload",
 			},
-		},
-		{
+		}, {
 			name: "ok_empty",
 			fields: Fields{
 				body: []byte{},
@@ -148,8 +147,30 @@ func TestSendRequest(t *testing.T) {
 			want: Want{
 				body: "",
 			},
-		},
-		{
+		}, {
+			name: "custom_error",
+			fields: Fields{
+				statusCode: http.StatusBadRequest,
+				body: []byte(`
+					{
+					  "type": "invalid_request_error",
+					  "message": "Invalid Request",
+					  "errors": [
+					    {
+					      "resource": "rule",
+					      "param": "forward_params",
+					      "code": "invalid_option",
+					      "message": "Must be true or false"
+					    }
+					  ]
+					}
+				`),
+			},
+			want: Want{
+				body: "",
+				err:  "invalid_request_error: Invalid Request",
+			},
+		}, {
 			name: "status_code_error",
 			fields: Fields{
 				statusCode: http.StatusInternalServerError,
@@ -159,8 +180,7 @@ func TestSendRequest(t *testing.T) {
 				body: "",
 				err:  "received status code: 500",
 			},
-		},
-		{
+		}, {
 			name: "method_invalid",
 			fields: Fields{
 				method: "invalid method",

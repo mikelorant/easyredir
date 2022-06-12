@@ -68,7 +68,7 @@ func (err APIErrors) Error() string {
 	var sb strings.Builder
 	fmt.Fprint(&sb, err.Type)
 	if err.Message != "" {
-		fmt.Fprintf(&sb, " :%v", err.Message)
+		fmt.Fprintf(&sb, ": %v", err.Message)
 	}
 	return sb.String()
 }
