@@ -43,6 +43,12 @@ type APIError struct {
 	Message  string `json:"message"`
 }
 
+type RateLimitError struct {
+	Limit     string
+	Remaining string
+	Reset     string
+}
+
 const (
 	_BaseURL      = "https://api.easyredir.com/v1"
 	_ResourceType = "application/json; charset=utf-8"
@@ -71,6 +77,10 @@ func (err APIErrors) Error() string {
 		fmt.Fprintf(&sb, ": %v", err.Message)
 	}
 	return sb.String()
+}
+
+func (err RateLimitError) Error() string {
+	return fmt.Sprintf("rate limited with limit: %v, remaining: %v, reset: %v", err.Limit, err.Remaining, err.Reset)
 }
 
 func decodeJSON(r io.ReadCloser, v interface{}) error {
@@ -104,11 +114,11 @@ func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.
 	}
 
 	if resp.StatusCode == http.StatusTooManyRequests {
-		return nil, fmt.Errorf("rate limited: remaining: %v, limit: %v, reset: %v",
-			resp.Header.Get("X-Ratelimit-Limit"),
-			resp.Header.Get("X-Ratelimit-Remaining"),
-			resp.Header.Get("X-Ratelimit-Reset"),
-		)
+		return nil, &RateLimitError{
+			Limit:     resp.Header.Get("X-Ratelimit-Limit"),
+			Remaining: resp.Header.Get("X-Ratelimit-Remaining"),
+			Reset:     resp.Header.Get("X-Ratelimit-Reset"),
+		}
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusBadRequest {
