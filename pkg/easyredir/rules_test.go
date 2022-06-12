@@ -465,7 +465,7 @@ func TestListRulesPaginator(t *testing.T) {
 						  "has_more": true
 					  },
 					  "links": {
-						  "next": "2"
+						  "next": "/v1/rules?starting_after=abc-def"
 					  }
 					}
 					{
@@ -515,7 +515,7 @@ func TestListRulesPaginator(t *testing.T) {
 						  "has_more": true
 					  },
 					  "links": {
-						  "next": "2"
+						  "next": "/v1/rules?starting_after=abc-def"
 					  }
 					}
 					{ notjson }
