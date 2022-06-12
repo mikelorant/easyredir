@@ -193,17 +193,17 @@ func TestListRules(t *testing.T) {
 
 func TestListRulesPathQuery(t *testing.T) {
 	type Args struct {
-		options	*RulesOptions
+		options *RulesOptions
 	}
 
 	type Want struct {
 		pathQuery string
 	}
 
-	tests := []struct{
-		name	string
-		args	Args
-		want	Want
+	tests := []struct {
+		name string
+		args Args
+		want Want
 	}{
 		{
 			name: "no_options",
@@ -284,7 +284,7 @@ func TestListRulesPathQuery(t *testing.T) {
 				options: &RulesOptions{
 					sourceFilter: "http://www1.example.org",
 					targetFilter: "http://www2.example.org",
-					limit: 100,
+					limit:        100,
 					pagination: Pagination{
 						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},

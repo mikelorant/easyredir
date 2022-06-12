@@ -30,20 +30,20 @@ type Config struct {
 }
 
 type APIErrors struct {
-	Type	string		`json:"type"`
-	Message	string		`json:"message"`
-	Errors	[]APIError	`json:"errors"`
+	Type    string     `json:"type"`
+	Message string     `json:"message"`
+	Errors  []APIError `json:"errors"`
 }
 
 type APIError struct {
-	Resource	string	`json:"resource"`
-	Param		string	`json:"param"`
-	Code		string	`json:"code"`
-	Message		string	`json:"message"`
+	Resource string `json:"resource"`
+	Param    string `json:"param"`
+	Code     string `json:"code"`
+	Message  string `json:"message"`
 }
 
 const (
-	_BaseURL = "https://api.easyredir.com/v1"
+	_BaseURL      = "https://api.easyredir.com/v1"
 	_ResourceType = "application/json; charset=utf-8"
 )
 

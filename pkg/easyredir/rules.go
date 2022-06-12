@@ -37,15 +37,15 @@ type Links struct {
 }
 
 type Pagination struct {
-	startingAfter	string
-	endingBefore	string
+	startingAfter string
+	endingBefore  string
 }
 
 type RulesOptions struct {
-	sourceFilter 	string
-	targetFilter 	string
-	limit        	int
-	pagination		Pagination
+	sourceFilter string
+	targetFilter string
+	limit        int
+	pagination   Pagination
 }
 
 func WithSourceFilter(url string) func(*RulesOptions) {
