@@ -24,10 +24,7 @@ func TestPing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := New(&Config{
-				Key:    "",
-				Secret: "",
-			})
+			cl := New(&Config{})
 
 			got := cl.Ping()
 			td.Cmp(t, got, tt.want)

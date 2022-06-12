@@ -1,0 +1,12 @@
+{
+  "type": "invalid_request_error",
+  "message": "Invalid Request",
+  "errors": [
+    {
+      "resource": "rule",
+      "param": "forward_params",
+      "code": "invalid_option",
+      "message": "Must be true or false"
+    }
+  ]
+}
