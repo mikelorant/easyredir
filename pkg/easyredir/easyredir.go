@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -64,11 +65,16 @@ func (c *Easyredir) Ping() string {
 }
 
 func (err APIErrors) Error() string {
-	return err.Message
+	var sb strings.Builder
+	fmt.Fprint(&sb, err.Type)
+	if err.Message != "" {
+		fmt.Fprintf(&sb, " :%v", err.Message)
+	}
+	return sb.String()
 }
 
 func decodeJSON(r io.ReadCloser, v interface{}) error {
-	if err := json.NewDecoder(r).Decode(&v); err != nil {
+	if err := json.NewDecoder(r).Decode(v); err != nil {
 		return fmt.Errorf("unable to json decode: %w", err)
 	}
 	r.Close()
