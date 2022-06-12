@@ -25,8 +25,8 @@ type Client struct {
 
 type Config struct {
 	baseURL   string
-	apiKey    string
-	apiSecret string
+	APIKey    string
+	APISecret string
 }
 
 type APIErrors struct {
@@ -84,7 +84,7 @@ func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.
 		return nil, fmt.Errorf("unable to create a new request: %w", err)
 	}
 
-	req.SetBasicAuth(cl.config.apiKey, cl.config.apiSecret)
+	req.SetBasicAuth(cl.config.APIKey, cl.config.APISecret)
 	req.Header.Set("Content-Type", _ResourceType)
 	req.Header.Set("Accept", _ResourceType)
 

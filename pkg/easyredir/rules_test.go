@@ -382,7 +382,7 @@ func (m *mockPaginatorClient) sendRequest(baseURL, path, method string, body io.
 		if err == io.EOF {
 			break
 		}
-		if err != nil && err != io.EOF {
+		if err != nil {
 			return nil, fmt.Errorf("unable to decode json page %v: %w", i, err)
 		}
 		docs[i] = doc
