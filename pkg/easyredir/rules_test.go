@@ -500,6 +500,39 @@ func TestListRulesPaginator(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "invalid_page",
+			fields: Fields{
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "rule"
+					    }
+					  ],
+					  "meta": {
+						  "has_more": true
+					  },
+					  "links": {
+						  "next": "2"
+					  }
+					}
+					{ notjson }
+				`,
+			},
+			want: Want{
+				rules: Rules{
+					Data: []RuleData{
+						{
+							ID:   ptr.String("abc-def"),
+							Type: ptr.String("rule"),
+						},
+					},
+				},
+				err: "unable to get a rules page",
+			},
+		},
 	}
 
 	for _, tt := range tests {
