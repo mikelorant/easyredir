@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ghodss/yaml"
+	"github.com/mikelorant/easyredir-cli/internal/structutil"
 )
 
 type Rules struct {
@@ -169,8 +169,9 @@ func listRulesPathQuery(opts *RulesOptions) string {
 }
 
 func (r RuleData) String() string {
-	y, _ := yaml.Marshal(r)
-	return fmt.Sprint(string(y))
+	str, _ := structutil.Sprint(r)
+
+	return str
 }
 
 func (r Rules) String() string {

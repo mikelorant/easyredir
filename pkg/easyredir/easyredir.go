@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -71,12 +70,11 @@ func (c *Easyredir) Ping() string {
 }
 
 func (err APIErrors) Error() string {
-	var sb strings.Builder
-	fmt.Fprint(&sb, err.Type)
+	str := err.Type
 	if err.Message != "" {
-		fmt.Fprintf(&sb, ": %v", err.Message)
+		str = fmt.Sprintf("%v: %v", str, err.Message)
 	}
-	return sb.String()
+	return str
 }
 
 func (err RateLimitError) Error() string {
