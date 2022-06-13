@@ -16,8 +16,8 @@ type Rules struct {
 }
 
 type RuleData struct {
-	ID            string        `json:"id"`
-	Type          string        `json:"type"`
+	ID            string         `json:"id"`
+	Type          string         `json:"type"`
 	Attributes    RuleAttributes `json:"attributes"`
 	Relationships Relationships  `json:"relationships"`
 }
@@ -96,7 +96,7 @@ func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) 
 	for {
 		optsWithPage := opts
 		if rules.HasMore() {
-			optsWithPage = append(opts, rules.NextPage())
+			optsWithPage = append(optsWithPage, rules.NextPage())
 		}
 
 		rules, err = e.listRules(optsWithPage...)

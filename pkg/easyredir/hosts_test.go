@@ -13,7 +13,7 @@ func TestListHosts(t *testing.T) {
 		options []func(*HostsOptions)
 	}
 	type Fields struct {
-		data	string
+		data string
 	}
 	type Want struct {
 		hosts Hosts
@@ -59,11 +59,11 @@ func TestListHosts(t *testing.T) {
 				hosts: Hosts{
 					Data: []HostData{
 						{
-							ID: "abc-def",
+							ID:   "abc-def",
 							Type: "host",
 							Attributes: HostAttributes{
-								Name: "easyredir.com",
-								DNSStatus: "active",
+								Name:              "easyredir.com",
+								DNSStatus:         "active",
 								CertificateStatus: "active",
 							},
 							Links: HostLinks{
@@ -164,7 +164,7 @@ func TestBuildListHosts(t *testing.T) {
 			name: "all",
 			args: Args{
 				options: &HostsOptions{
-					limit:        100,
+					limit: 100,
 					pagination: Pagination{
 						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},

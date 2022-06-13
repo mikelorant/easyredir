@@ -51,7 +51,7 @@ func (e *Easyredir) ListHostsPaginator(opts ...func(*HostsOptions)) (h Hosts, er
 	for {
 		optsWithPage := opts
 		if hosts.HasMore() {
-			optsWithPage = append(opts, hosts.NextPage())
+			optsWithPage = append(optsWithPage, hosts.NextPage())
 		}
 
 		hosts, err = e.ListHosts(optsWithPage...)
