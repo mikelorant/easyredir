@@ -12,20 +12,20 @@ import (
 )
 
 type Rules struct {
-	options  RulesOptions
-	Data     []RuleData `json:"data"`
-	Metadata Metadata   `json:"meta"`
-	Links    Links      `json:"links"`
+	options  Options
+	Data     []Data   `json:"data"`
+	Metadata Metadata `json:"meta"`
+	Links    Links    `json:"links"`
 }
 
-type RuleData struct {
-	ID            string         `json:"id"`
-	Type          string         `json:"type"`
-	Attributes    RuleAttributes `json:"attributes,omitempty"`
-	Relationships Relationships  `json:"relationships,omitempty"`
+type Data struct {
+	ID            string        `json:"id"`
+	Type          string        `json:"type"`
+	Attributes    Attributes    `json:"attributes,omitempty"`
+	Relationships Relationships `json:"relationships,omitempty"`
 }
 
-type RuleAttributes struct {
+type Attributes struct {
 	ForwardParams *bool    `json:"forward_params,omitempty"`
 	ForwardPath   *bool    `json:"forward_path,omitempty"`
 	ResponseType  *string  `json:"response_type,omitempty"`
@@ -33,11 +33,11 @@ type RuleAttributes struct {
 	TargetURL     *string  `json:"target_url,omitempty"`
 }
 
-type RulesResponseType string
+type ResponseType string
 
 const (
-	RulesResponseMovedPermanently RulesResponseType = "moved permanently"
-	RulesResponseFound            RulesResponseType = "found"
+	ResponseMovedPermanently ResponseType = "moved permanently"
+	ResponseFound            ResponseType = "found"
 )
 
 type Relationships struct {
@@ -72,34 +72,34 @@ type Pagination struct {
 	endingBefore  string
 }
 
-type RulesOptions struct {
+type Options struct {
 	sourceFilter string
 	targetFilter string
 	limit        int
 	pagination   Pagination
 }
 
-func WithSourceFilter(url string) func(*RulesOptions) {
-	return func(o *RulesOptions) {
+func WithSourceFilter(url string) func(*Options) {
+	return func(o *Options) {
 		o.sourceFilter = url
 	}
 }
 
-func WithTargetFilter(url string) func(*RulesOptions) {
-	return func(o *RulesOptions) {
+func WithTargetFilter(url string) func(*Options) {
+	return func(o *Options) {
 		o.targetFilter = url
 	}
 }
 
-func WithLimit(limit int) func(*RulesOptions) {
-	return func(o *RulesOptions) {
+func WithLimit(limit int) func(*Options) {
+	return func(o *Options) {
 		o.limit = limit
 	}
 }
 
-func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r Rules, err error) {
+func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err error) {
 	r = Rules{
-		Data: []RuleData{},
+		Data: []Data{},
 	}
 
 	rules := Rules{}
@@ -122,8 +122,8 @@ func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r 
 	return r, nil
 }
 
-func ListRules(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r Rules, err error) {
-	options := &RulesOptions{}
+func ListRules(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err error) {
+	options := &Options{}
 	for _, o := range opts {
 		o(options)
 	}
@@ -141,8 +141,8 @@ func ListRules(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r Rules, er
 	return r, nil
 }
 
-func (r *Rules) NextPage() func(o *RulesOptions) {
-	return func(o *RulesOptions) {
+func (r *Rules) NextPage() func(o *Options) {
+	return func(o *Options) {
 		o.pagination.startingAfter = strings.Split(r.Links.Next, "=")[1]
 	}
 }
@@ -151,7 +151,7 @@ func (r *Rules) HasMore() bool {
 	return r.Metadata.HasMore
 }
 
-func (r RuleData) String() string {
+func (r Data) String() string {
 	str, _ := structutil.Sprint(r)
 
 	return str
@@ -168,7 +168,7 @@ func (r Rules) String() string {
 	return strings.Join(ss, "\n")
 }
 
-func buildListRules(opts *RulesOptions) string {
+func buildListRules(opts *Options) string {
 	var sb strings.Builder
 	var params []string
 

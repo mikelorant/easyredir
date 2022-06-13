@@ -27,7 +27,7 @@ func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (
 
 func TestListRules(t *testing.T) {
 	type Args struct {
-		options []func(*RulesOptions)
+		options []func(*Options)
 	}
 
 	type Fields struct {
@@ -78,11 +78,11 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
-							Attributes: RuleAttributes{
+							Attributes: Attributes{
 								ForwardParams: ptr.Bool(true),
 								ForwardPath:   ptr.Bool(true),
 								ResponseType:  ptr.String("moved_permanently"),
@@ -106,7 +106,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_source_filter",
 			args: Args{
-				options: []func(*RulesOptions){
+				options: []func(*Options){
 					WithSourceFilter("https://www1.example.org"),
 				},
 			},
@@ -124,7 +124,7 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -135,7 +135,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_target_filter",
 			args: Args{
-				options: []func(*RulesOptions){
+				options: []func(*Options){
 					WithTargetFilter("https://www2.example.org"),
 				},
 			},
@@ -153,7 +153,7 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -164,7 +164,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_both_source_target_filter",
 			args: Args{
-				options: []func(*RulesOptions){
+				options: []func(*Options){
 					WithSourceFilter("https://www1.example.org"),
 					WithTargetFilter("https://www2.example.org"),
 				},
@@ -183,7 +183,7 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -194,7 +194,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_limit",
 			args: Args{
-				options: []func(*RulesOptions){
+				options: []func(*Options){
 					WithLimit(1),
 				},
 			},
@@ -212,7 +212,7 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -227,7 +227,7 @@ func TestListRules(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{},
+					Data: []Data{},
 				},
 				err: "unable to get json",
 			},
@@ -257,7 +257,7 @@ func TestListRules(t *testing.T) {
 
 func TestBuildListRules(t *testing.T) {
 	type Args struct {
-		options *RulesOptions
+		options *Options
 	}
 
 	type Want struct {
@@ -272,7 +272,7 @@ func TestBuildListRules(t *testing.T) {
 		{
 			name: "no_options",
 			args: Args{
-				options: &RulesOptions{},
+				options: &Options{},
 			},
 			want: Want{
 				pathQuery: "/rules",
@@ -280,7 +280,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "starting_after",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					pagination: Pagination{
 						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
@@ -292,7 +292,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "ending_before",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					pagination: Pagination{
 						endingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
@@ -304,7 +304,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "source_filter",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					sourceFilter: "http://www1.example.org",
 				},
 			},
@@ -314,7 +314,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "target_filter",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					targetFilter: "http://www2.example.org",
 				},
 			},
@@ -324,7 +324,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "source_target_filter",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					sourceFilter: "http://www1.example.org",
 					targetFilter: "http://www2.example.org",
 				},
@@ -335,7 +335,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "limit",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					limit: 100,
 				},
 			},
@@ -345,7 +345,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "all",
 			args: Args{
-				options: &RulesOptions{
+				options: &Options{
 					sourceFilter: "http://www1.example.org",
 					targetFilter: "http://www2.example.org",
 					limit:        100,
@@ -407,7 +407,7 @@ func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.
 
 func TestListRulesPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*RulesOptions)
+		options []func(*Options)
 	}
 
 	type Fields struct {
@@ -441,7 +441,7 @@ func TestListRulesPaginator(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -483,7 +483,7 @@ func TestListRulesPaginator(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -499,7 +499,7 @@ func TestListRulesPaginator(t *testing.T) {
 			name: "none",
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{},
+					Data: []Data{},
 				},
 			},
 		},
@@ -526,7 +526,7 @@ func TestListRulesPaginator(t *testing.T) {
 			},
 			want: Want{
 				rules: Rules{
-					Data: []RuleData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -562,12 +562,12 @@ func TestListRulesPaginator(t *testing.T) {
 func TestRulesDataStringer(t *testing.T) {
 	tests := []struct {
 		name string
-		give RuleData
+		give Data
 		want string
 	}{
 		{
 			name: "minimal",
-			give: RuleData{
+			give: Data{
 				ID:   "abc-def",
 				Type: "rule",
 			},
@@ -578,10 +578,10 @@ func TestRulesDataStringer(t *testing.T) {
 		},
 		{
 			name: "typical",
-			give: RuleData{
+			give: Data{
 				ID:   "abc-def",
 				Type: "rule",
-				Attributes: RuleAttributes{
+				Attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
 					ForwardPath:   ptr.Bool(true),
 					ResponseType:  ptr.String("moved_permanently"),
@@ -607,7 +607,7 @@ func TestRulesDataStringer(t *testing.T) {
 		},
 		{
 			name: "empty",
-			give: RuleData{},
+			give: Data{},
 			want: heredoc.Doc(`
 				id: ""
 				type: ""
@@ -632,7 +632,7 @@ func TestRulesStringer(t *testing.T) {
 		{
 			name: "minimal",
 			give: Rules{
-				Data: []RuleData{
+				Data: []Data{
 					{
 						ID:   "abc-def",
 						Type: "rule",
