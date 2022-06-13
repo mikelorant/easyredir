@@ -112,16 +112,13 @@ func (e *Easyredir) ListRulesPaginator(opts ...func(*RulesOptions)) (r Rules, er
 	}
 
 	rules := Rules{}
-	i := 0
 	for {
-		optsWithPagination := opts
-		if rules.Links.Next != "" {
-			optsWithPagination = append(opts, func(o *RulesOptions) {
-				o.pagination.startingAfter = strings.Split(rules.Links.Next, "=")[1]
-			})
+		optsWithPage := opts
+		if rules.HasMore() {
+			optsWithPage = append(opts, rules.NextPage())
 		}
 
-		rules, err = e.ListRules(optsWithPagination...)
+		rules, err = e.ListRules(optsWithPage...)
 		if err != nil {
 			return r, fmt.Errorf("unable to get a rules page: %w", err)
 		}
@@ -129,10 +126,19 @@ func (e *Easyredir) ListRulesPaginator(opts ...func(*RulesOptions)) (r Rules, er
 		if !rules.Metadata.HasMore {
 			break
 		}
-		i++
 	}
 
 	return r, nil
+}
+
+func (r *Rules) NextPage() func(o *RulesOptions) {
+	return func(o *RulesOptions) {
+		o.pagination.startingAfter = strings.Split(r.Links.Next, "=")[1]
+	}
+}
+
+func (r *Rules) HasMore() bool {
+	return r.Metadata.HasMore
 }
 
 func listRulesPathQuery(opts *RulesOptions) string {
