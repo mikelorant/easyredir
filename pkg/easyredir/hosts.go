@@ -42,7 +42,7 @@ func WithHostsLimit(limit int) func(*HostsOptions) {
 	}
 }
 
-func (e *Easyredir) ListHostsPagination(opts ...func(*HostsOptions)) (h Hosts, err error) {
+func (e *Easyredir) ListHostsPaginator(opts ...func(*HostsOptions)) (h Hosts, err error) {
 	h = Hosts{
 		Data: []HostData{},
 	}

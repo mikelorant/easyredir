@@ -326,7 +326,7 @@ func TestListHostsPaginator(t *testing.T) {
 				config: &Config{},
 			}
 
-			got, err := e.ListHostsPagination(tt.args.options...)
+			got, err := e.ListHostsPaginator(tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

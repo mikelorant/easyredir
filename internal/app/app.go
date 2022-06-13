@@ -43,7 +43,7 @@ func listRules(e *easyredir.Easyredir) error {
 }
 
 func listHosts(e *easyredir.Easyredir) error {
-	hosts, err := e.ListHosts(easyredir.WithHostsLimit(100))
+	hosts, err := e.ListHostsPaginator(easyredir.WithHostsLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list hosts: %w", err)
 	}
