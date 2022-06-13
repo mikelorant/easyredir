@@ -12,72 +12,72 @@ import (
 )
 
 type Hosts struct {
-	Data     []HostData `json:"data"`
-	Metadata Metadata   `json:"meta"`
-	Links    Links      `json:"links"`
+	Data     []Data   `json:"data"`
+	Metadata Metadata `json:"meta"`
+	Links    Links    `json:"links"`
 }
 
-type HostData struct {
-	ID         string         `json:"id"`
-	Type       string         `json:"type"`
-	Attributes HostAttributes `json:"attributes"`
-	Links      HostLinks      `json:"links"`
+type Data struct {
+	ID         string     `json:"id"`
+	Type       string     `json:"type"`
+	Attributes Attributes `json:"attributes"`
+	Links      HostLinks  `json:"links"`
 }
 
-type HostAttributes struct {
-	Name              string                `json:"name"`
-	DNSStatus         HostDNSStatus         `json:"dns_status"`
-	CertificateStatus HostCertificateStatus `json:"certificate_status"`
+type Attributes struct {
+	Name              string            `json:"name"`
+	DNSStatus         DNSStatus         `json:"dns_status"`
+	CertificateStatus CertificateStatus `json:"certificate_status"`
 }
 
 type HostLinks struct {
 	Self string `json:"self"`
 }
 
-type HostsOptions struct {
+type Options struct {
 	limit      int
 	pagination Pagination
 }
 
 type Host struct {
-	Data HostDataExtended
+	Data DataExtended
 }
 
-type HostDataExtended struct {
-	ID         string                 `json:"id"`
-	Type       string                 `json:"type"`
-	Attributes HostAttributesExtended `json:"attributes"`
-	Links      HostLinks              `json:"links"`
+type DataExtended struct {
+	ID         string             `json:"id"`
+	Type       string             `json:"type"`
+	Attributes AttributesExtended `json:"attributes"`
+	Links      HostLinks          `json:"links"`
 }
 
-type HostAttributesExtended struct {
-	Name               string                 `json:"name"`
-	DNSStatus          HostDNSStatus          `json:"dns_status"`
-	DNSTestedAt        string                 `json:"dns_tested_at"` // TODO: time.Time
-	CertificateStatus  string                 `json:"certificate_status"`
-	ACMEEnabled        bool                   `json:"acme_enabled"`
-	MatchOptions       HostMatchOptions       `json:"match_options"`
-	NotFoundAction     HostNotFoundActions    `json:"not_found_action"`
-	Security           HostSecurity           `json:"security"`
-	RequiredDNSEntries HostRequiredDNSEntries `json:"required_dns_entries"`
-	DetectedDNSEntries []DNSValues            `json:"detected_dns_entries"`
+type AttributesExtended struct {
+	Name               string             `json:"name"`
+	DNSStatus          DNSStatus          `json:"dns_status"`
+	DNSTestedAt        string             `json:"dns_tested_at"` // TODO: time.Time
+	CertificateStatus  string             `json:"certificate_status"`
+	ACMEEnabled        bool               `json:"acme_enabled"`
+	MatchOptions       MatchOptions       `json:"match_options"`
+	NotFoundAction     NotFoundActions    `json:"not_found_action"`
+	Security           Security           `json:"security"`
+	RequiredDNSEntries RequiredDNSEntries `json:"required_dns_entries"`
+	DetectedDNSEntries []DNSValues        `json:"detected_dns_entries"`
 }
 
-type HostMatchOptions struct {
+type MatchOptions struct {
 	CaseInsensitive  *bool `json:"case_insensitive"`
 	SlashInsensitive *bool `json:"slash_insensitive"`
 }
 
-type HostNotFoundActions struct {
-	ForwardParams        *bool             `json:"forward_params"`
-	ForwardPath          *bool             `json:"forward_path"`
-	Custom404Body        *string           `json:"custom_404_body"`
-	Custom404BodyPresent bool              `json:"custom_404_body_present"`
-	ResponseCode         *HostResponseCode `json:"response_code"`
-	ResponseURL          *string           `json:"response_url"`
+type NotFoundActions struct {
+	ForwardParams        *bool         `json:"forward_params"`
+	ForwardPath          *bool         `json:"forward_path"`
+	Custom404Body        *string       `json:"custom_404_body"`
+	Custom404BodyPresent bool          `json:"custom_404_body_present"`
+	ResponseCode         *ResponseCode `json:"response_code"`
+	ResponseURL          *string       `json:"response_url"`
 }
 
-type HostSecurity struct {
+type Security struct {
 	HTTPSUpgrade            *bool `json:"https_upgrade"`
 	PreventForeignEmbedding *bool `json:"prevent_foreign_embedding"`
 	HSTSIncludeSubDomains   *bool `json:"hsts_include_sub_domains"`
@@ -85,7 +85,7 @@ type HostSecurity struct {
 	HSTSPreload             *bool `json:"hsts_preload"`
 }
 
-type HostRequiredDNSEntries struct {
+type RequiredDNSEntries struct {
 	Recommended  DNSValues   `json:"recommended"`
 	Alternatives []DNSValues `json:"alternatives"`
 }
@@ -98,35 +98,35 @@ type DNSValues struct {
 type DNSValuesType string
 
 const (
-	HostDNSARecord     DNSValuesType = "A"
-	HostDNSCNAMERecord DNSValuesType = "CNAME"
+	DNSARecord     DNSValuesType = "A"
+	DNSCNAMERecord DNSValuesType = "CNAME"
 )
 
-type HostResponseCode int
+type ResponseCode int
 
 const (
-	HostResponseMovedPermanently HostResponseCode = 301
-	HostResponseFound            HostResponseCode = 302
-	HostResponseNotFound         HostResponseCode = 401
+	ResponseCodeMovedPermanently ResponseCode = 301
+	ResponseCodeFound            ResponseCode = 302
+	ResponseCodeNotFound         ResponseCode = 401
 )
 
-type HostDNSStatus string
+type DNSStatus string
 
 const (
-	HostDNSStatusActive  HostDNSStatus = "active"
-	HostDNSStatusInvalid HostDNSStatus = "invalid"
+	DNSStatusActive  DNSStatus = "active"
+	DNSStatusInvalid DNSStatus = "invalid"
 )
 
-type HostCertificateStatus string
+type CertificateStatus string
 
 const (
-	HostCertificateStatusActive                     HostCertificateStatus = "active"
-	HostCertificateStatusProcessing                 HostCertificateStatus = "processing"
-	HostCertificateStatusInvalidDNS                 HostCertificateStatus = "invalid_dns"
-	HostCertificateStatusAutoSSLNotSupported        HostCertificateStatus = "auto_ssl_not_supported"
-	HostCertificateStatusHostnameContainsUnderscore HostCertificateStatus = "hostname_contains_underscore"
-	HostCertificateStatusInvalidCAARecord           HostCertificateStatus = "invalid_caa_record"
-	HostCertificateStatusAAAARecordPresent          HostCertificateStatus = "aaaa_record_present"
+	CertificateStatusActive                     CertificateStatus = "active"
+	CertificateStatusProcessing                 CertificateStatus = "processing"
+	CertificateStatusInvalidDNS                 CertificateStatus = "invalid_dns"
+	CertificateStatusAutoSSLNotSupported        CertificateStatus = "auto_ssl_not_supported"
+	CertificateStatusHostnameContainsUnderscore CertificateStatus = "hostname_contains_underscore"
+	CertificateStatusInvalidCAARecord           CertificateStatus = "invalid_caa_record"
+	CertificateStatusAAAARecordPresent          CertificateStatus = "aaaa_record_present"
 )
 
 type Metadata struct {
@@ -143,15 +143,15 @@ type Pagination struct {
 	endingBefore  string
 }
 
-func WithHostsLimit(limit int) func(*HostsOptions) {
-	return func(o *HostsOptions) {
+func WithHostsLimit(limit int) func(*Options) {
+	return func(o *Options) {
 		o.limit = limit
 	}
 }
 
-func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h Hosts, err error) {
+func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts, err error) {
 	h = Hosts{
-		Data: []HostData{},
+		Data: []Data{},
 	}
 
 	hosts := Hosts{}
@@ -174,8 +174,8 @@ func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h 
 	return h, nil
 }
 
-func (h *Hosts) NextPage() func(o *HostsOptions) {
-	return func(o *HostsOptions) {
+func (h *Hosts) NextPage() func(o *Options) {
+	return func(o *Options) {
 		o.pagination.startingAfter = strings.Split(h.Links.Next, "=")[1]
 	}
 }
@@ -184,8 +184,8 @@ func (h *Hosts) HasMore() bool {
 	return h.Metadata.HasMore
 }
 
-func ListHosts(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h Hosts, err error) {
-	options := &HostsOptions{}
+func ListHosts(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts, err error) {
+	options := &Options{}
 	for _, o := range opts {
 		o(options)
 	}
@@ -203,7 +203,7 @@ func ListHosts(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h Hosts, er
 	return h, nil
 }
 
-func (h HostData) String() string {
+func (h Data) String() string {
 	str, _ := structutil.Sprint(h)
 
 	return str
@@ -220,7 +220,7 @@ func (h Hosts) String() string {
 	return strings.Join(ss, "\n")
 }
 
-func (h HostDataExtended) String() string {
+func (h DataExtended) String() string {
 	str, _ := structutil.Sprint(h)
 
 	return str
@@ -230,7 +230,7 @@ func (h Host) String() string {
 	return fmt.Sprint(h.Data)
 }
 
-func buildListHosts(opts *HostsOptions) string {
+func buildListHosts(opts *Options) string {
 	var sb strings.Builder
 	var params []string
 

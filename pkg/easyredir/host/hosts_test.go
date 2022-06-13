@@ -26,7 +26,7 @@ func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (
 
 func TestListHosts(t *testing.T) {
 	type Args struct {
-		options []func(*HostsOptions)
+		options []func(*Options)
 	}
 	type Fields struct {
 		data string
@@ -73,11 +73,11 @@ func TestListHosts(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "host",
-							Attributes: HostAttributes{
+							Attributes: Attributes{
 								Name:              "easyredir.com",
 								DNSStatus:         "active",
 								CertificateStatus: "active",
@@ -113,7 +113,7 @@ func TestListHosts(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "host",
@@ -125,7 +125,7 @@ func TestListHosts(t *testing.T) {
 		{
 			name: "with_limit",
 			args: Args{
-				options: []func(*HostsOptions){
+				options: []func(*Options){
 					WithHostsLimit(1),
 				},
 			},
@@ -143,7 +143,7 @@ func TestListHosts(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "host",
@@ -177,7 +177,7 @@ func TestListHosts(t *testing.T) {
 
 func TestBuildListHosts(t *testing.T) {
 	type Args struct {
-		options *HostsOptions
+		options *Options
 	}
 
 	type Want struct {
@@ -192,7 +192,7 @@ func TestBuildListHosts(t *testing.T) {
 		{
 			name: "no_options",
 			args: Args{
-				options: &HostsOptions{},
+				options: &Options{},
 			},
 			want: Want{
 				pathQuery: "/hosts",
@@ -200,7 +200,7 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "starting_after",
 			args: Args{
-				options: &HostsOptions{
+				options: &Options{
 					pagination: Pagination{
 						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
@@ -212,7 +212,7 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "ending_before",
 			args: Args{
-				options: &HostsOptions{
+				options: &Options{
 					pagination: Pagination{
 						endingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
@@ -224,7 +224,7 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "limit",
 			args: Args{
-				options: &HostsOptions{
+				options: &Options{
 					limit: 100,
 				},
 			},
@@ -234,7 +234,7 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "all",
 			args: Args{
-				options: &HostsOptions{
+				options: &Options{
 					limit: 100,
 					pagination: Pagination{
 						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
@@ -294,7 +294,7 @@ func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.
 
 func TestListHostsPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*HostsOptions)
+		options []func(*Options)
 	}
 
 	type Fields struct {
@@ -328,7 +328,7 @@ func TestListHostsPaginator(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
@@ -370,7 +370,7 @@ func TestListHostsPaginator(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "host",
@@ -386,7 +386,7 @@ func TestListHostsPaginator(t *testing.T) {
 			name: "none",
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{},
+					Data: []Data{},
 				},
 			},
 		},
@@ -413,7 +413,7 @@ func TestListHostsPaginator(t *testing.T) {
 			},
 			want: Want{
 				hosts: Hosts{
-					Data: []HostData{
+					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "host",
@@ -449,12 +449,12 @@ func TestListHostsPaginator(t *testing.T) {
 func TestHostsDataStringer(t *testing.T) {
 	tests := []struct {
 		name string
-		give HostData
+		give Data
 		want string
 	}{
 		{
 			name: "minimal",
-			give: HostData{
+			give: Data{
 				ID:   "abc-def",
 				Type: "host",
 			},
@@ -471,7 +471,7 @@ func TestHostsDataStringer(t *testing.T) {
 		},
 		{
 			name: "empty",
-			give: HostData{},
+			give: Data{},
 			want: heredoc.Doc(`
 				id: ""
 				type: ""
@@ -502,7 +502,7 @@ func TestHostsStringer(t *testing.T) {
 		{
 			name: "minimal",
 			give: Hosts{
-				Data: []HostData{
+				Data: []Data{
 					{
 						ID:   "abc-def",
 						Type: "host",
@@ -569,7 +569,7 @@ func TestGetHosts(t *testing.T) {
 			},
 			want: Want{
 				host: Host{
-					Data: HostDataExtended{
+					Data: DataExtended{
 						ID:   "abc-123",
 						Type: "host",
 					},
