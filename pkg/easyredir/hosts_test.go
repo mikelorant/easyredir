@@ -82,6 +82,61 @@ func TestListHosts(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "minimal",
+			fields: Fields{
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "host"
+					    }
+					  ]
+					}
+				`,
+			},
+			want: Want{
+				hosts: Hosts{
+					Data: []HostData{
+						{
+							ID:   "abc-def",
+							Type: "host",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "with_limit",
+			args: Args{
+				options: []func(*HostsOptions){
+					WithHostsLimit(1),
+				},
+			},
+			fields: Fields{
+				data: `
+					{
+					  "data": [
+					    {
+					      "id": "abc-def",
+					      "type": "host"
+					    }
+					  ]
+					}
+				`,
+			},
+			want: Want{
+				hosts: Hosts{
+					Data: []HostData{
+						{
+							ID:   "abc-def",
+							Type: "host",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range tests {
