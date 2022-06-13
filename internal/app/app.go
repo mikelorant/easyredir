@@ -23,6 +23,13 @@ func Run() error {
 			return fmt.Errorf("unable to list rules: %w", err)
 		}
 	case "hosts":
+		if len(os.Args) > 2 {
+			if err := getHost(e); err != nil {
+				return fmt.Errorf("unable to list hosts: %w", err)
+			}
+			return nil
+		}
+
 		if err := listHosts(e); err != nil {
 			return fmt.Errorf("unable to list hosts: %w", err)
 		}
@@ -49,6 +56,17 @@ func listHosts(e *easyredir.Easyredir) error {
 	}
 
 	fmt.Print(hosts)
+
+	return nil
+}
+
+func getHost(e *easyredir.Easyredir) error {
+	host, err := e.GetHost(os.Args[2])
+	if err != nil {
+		return fmt.Errorf("unable to get host: %v: %w", os.Args[2], err)
+	}
+
+	fmt.Print(host)
 
 	return nil
 }

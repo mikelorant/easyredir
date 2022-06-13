@@ -479,3 +479,90 @@ func TestHostsStringer(t *testing.T) {
 		})
 	}
 }
+
+func TestGetHosts(t *testing.T) {
+	type Args struct {
+		id string
+	}
+
+	type Fields struct {
+		data string
+	}
+
+	type Want struct {
+		host Host
+		err  string
+	}
+
+	tests := []struct {
+		name   string
+		args   Args
+		fields Fields
+		want   Want
+	}{
+		{
+			name: "valid",
+			args: Args{
+				id: "abc-123",
+			},
+			fields: Fields{
+				data: `
+					{
+						"data": {
+							"id": "abc-123",
+							"type": "host"
+						}
+					}
+				`,
+			},
+			want: Want{
+				host: Host{
+					Data: HostDataExtended{
+						ID:   "abc-123",
+						Type: "host",
+					},
+				},
+			},
+		},
+		{
+			name: "invalid",
+			args: Args{
+				id: "abc-123",
+			},
+			fields: Fields{
+				data: `
+					{
+						"data": {
+							"id": "def-456",
+							"type": "host"
+						}
+					}
+				`,
+			},
+			want: Want{
+				err: "received incorrect host",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &Easyredir{
+				client: &mockClient{
+					data: tt.fields.data,
+				},
+				config: &Config{},
+			}
+
+			got, err := e.GetHost(tt.args.id)
+			if tt.want.err != "" {
+				assert.NotNil(t, err)
+				td.CmpContains(t, err, tt.want.err)
+				return
+			}
+			assert.Nil(t, err)
+			td.Cmp(t, got.Data.ID, tt.args.id)
+			td.Cmp(t, got, tt.want.host)
+		})
+	}
+}

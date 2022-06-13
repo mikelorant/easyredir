@@ -22,9 +22,9 @@ type HostData struct {
 }
 
 type HostAttributes struct {
-	Name              string `json:"name"`
-	DNSStatus         string `json:"dns_status"`
-	CertificateStatus string `json:"certificate_status"`
+	Name              string                `json:"name"`
+	DNSStatus         HostDNSStatus         `json:"dns_status"`
+	CertificateStatus HostCertificateStatus `json:"certificate_status"`
 }
 
 type HostLinks struct {
@@ -35,6 +35,90 @@ type HostsOptions struct {
 	limit      int
 	pagination Pagination
 }
+
+type Host struct {
+	Data HostDataExtended
+}
+
+type HostDataExtended struct {
+	ID         string                 `json:"id"`
+	Type       string                 `json:"type"`
+	Attributes HostAttributesExtended `json:"attributes"`
+	Links      HostLinks              `json:"links"`
+}
+
+type HostAttributesExtended struct {
+	Name               string                 `json:"name"`
+	DNSStatus          HostDNSStatus          `json:"dns_status"`
+	DNSTestedAt        string                 `json:"dns_tested_at"` // TODO: time.Time
+	CertificateStatus  string                 `json:"certificate_status"`
+	ACMEEnabled        bool                   `json:"acme_enabled"`
+	MatchOptions       HostMatchOptions       `json:"match_options"`
+	NotFoundAction     HostNotFoundActions    `json:"not_found_action"`
+	Security           HostSecurity           `json:"security"`
+	RequiredDNSEntries HostRequiredDNSEntries `json:"required_dns_entries"`
+	DetectedDNSEntries []DNSValues            `json:"detected_dns_entries"`
+}
+
+type HostMatchOptions struct {
+	CaseInsensitive  *bool `json:"case_insensitive"`
+	SlashInsensitive *bool `json:"slash_insensitive"`
+}
+
+type HostNotFoundActions struct {
+	ForwardParams        *bool             `json:"forward_params"`
+	ForwardPath          *bool             `json:"forward_path"`
+	Custom404Body        *string           `json:"custom_404_body"`
+	Custom404BodyPresent bool              `json:"custom_404_body_present"`
+	ResponseCode         *HostResponseCode `json:"response_code"`
+	ResponseURL          *string           `json:"response_url"`
+}
+
+type HostSecurity struct {
+	HTTPSUpgrade            *bool `json:"https_upgrade"`
+	PreventForeignEmbedding *bool `json:"prevent_foreign_embedding"`
+	HSTSIncludeSubDomains   *bool `json:"hsts_include_sub_domains"`
+	HSTSMaxAge              *int  `json:"hsts_max_age"`
+	HSTSPreload             *bool `json:"hsts_preload"`
+}
+
+type HostRequiredDNSEntries struct {
+	Recommended  DNSValues   `json:"recommended"`
+	Alternatives []DNSValues `json:"alternatives"`
+}
+
+type DNSValues struct {
+	Type   string          `json:"type"`
+	Values []DNSValuesType `json:"values"`
+}
+
+type DNSValuesType string
+
+const (
+	HostDNSARecord     DNSValuesType = "A"
+	HostDNSCNAMERecord DNSValuesType = "CNAME"
+)
+
+type HostResponseCode int
+
+const (
+	HostResponseMovedPermanently HostResponseCode = 301
+	HostResponseFound            HostResponseCode = 302
+	HostResponseNotFound         HostResponseCode = 401
+)
+
+type HostDNSStatus string
+
+const (
+	HostDNSStatusActive  HostDNSStatus = "active"
+	HostDNSStatusInvalid               = "invalid"
+)
+
+type HostCertificateStatus string
+
+const (
+	HostCertificateStatusActive HostCertificateStatus = "active"
+)
 
 func WithHostsLimit(limit int) func(*HostsOptions) {
 	return func(o *HostsOptions) {
@@ -113,6 +197,16 @@ func (h Hosts) String() string {
 	return strings.Join(ss, "\n")
 }
 
+func (h HostDataExtended) String() string {
+	str, _ := structutil.Sprint(h)
+
+	return str
+}
+
+func (h Host) String() string {
+	return fmt.Sprint(h.Data)
+}
+
 func buildListHosts(opts *HostsOptions) string {
 	var sb strings.Builder
 	var params []string
@@ -136,4 +230,26 @@ func buildListHosts(opts *HostsOptions) string {
 	}
 
 	return sb.String()
+}
+
+func (e *Easyredir) GetHost(id string) (h Host, err error) {
+	pathQuery := buildGetHost(id)
+	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
+	if err != nil {
+		return h, fmt.Errorf("unable to send request: %w", err)
+	}
+
+	if err := decodeJSON(reader, &h); err != nil {
+		return h, fmt.Errorf("unable to get json: %w", err)
+	}
+
+	if ok := (h.Data.ID == id); !ok {
+		return h, fmt.Errorf("received incorrect host: %v", h.Data.ID)
+	}
+
+	return h, nil
+}
+
+func buildGetHost(id string) string {
+	return fmt.Sprintf("/hosts/%v", id)
 }
