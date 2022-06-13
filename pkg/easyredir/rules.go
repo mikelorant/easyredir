@@ -30,6 +30,13 @@ type RuleAttributes struct {
 	TargetURL     *string   `json:"target_url"`
 }
 
+type RulesResponseType string
+
+const (
+	RulesResponseMovedPermanently RulesResponseType = "moved permanently"
+	RulesResponseFound            RulesResponseType = "found"
+)
+
 type Relationships struct {
 	SourceHosts SourceHosts `json:"source_hosts"`
 }
