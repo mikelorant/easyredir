@@ -1,9 +1,9 @@
 package host
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
-	"encoding/json"
 	"strings"
 	"testing"
 

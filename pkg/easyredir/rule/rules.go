@@ -1,9 +1,9 @@
 package rule
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
-	"encoding/json"
 	"net/http"
 	"strings"
 
