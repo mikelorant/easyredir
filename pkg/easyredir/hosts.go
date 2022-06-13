@@ -111,13 +111,19 @@ type HostDNSStatus string
 
 const (
 	HostDNSStatusActive  HostDNSStatus = "active"
-	HostDNSStatusInvalid               = "invalid"
+	HostDNSStatusInvalid HostDNSStatus = "invalid"
 )
 
 type HostCertificateStatus string
 
 const (
-	HostCertificateStatusActive HostCertificateStatus = "active"
+	HostCertificateStatusActive                     HostCertificateStatus = "active"
+	HostCertificateStatusProcessing                 HostCertificateStatus = "processing"
+	HostCertificateStatusInvalidDNS                 HostCertificateStatus = "invalid_dns"
+	HostCertificateStatusAutoSSLNotSupported        HostCertificateStatus = "auto_ssl_not_supported"
+	HostCertificateStatusHostnameContainsUnderscore HostCertificateStatus = "hostname_contains_underscore"
+	HostCertificateStatusInvalidCAARecord           HostCertificateStatus = "invalid_caa_record"
+	HostCertificateStatusAAAARecordPresent          HostCertificateStatus = "aaaa_record_present"
 )
 
 func WithHostsLimit(limit int) func(*HostsOptions) {
