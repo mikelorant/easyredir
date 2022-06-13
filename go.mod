@@ -3,8 +3,8 @@ module github.com/mikelorant/easyredir-cli
 go 1.18
 
 require (
+	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/alecthomas/chroma v0.10.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/goccy/go-yaml v1.9.5
 	github.com/google/uuid v1.3.0
 	github.com/gotidy/ptr v1.4.0
@@ -21,6 +21,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

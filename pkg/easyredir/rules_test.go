@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/gotidy/ptr"
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/assert"
@@ -552,6 +553,107 @@ func TestListRulesPaginator(t *testing.T) {
 			}
 			assert.Nil(t, err)
 			td.Cmp(t, got, tt.want.rules)
+		})
+	}
+}
+
+func TestRulesDataStringer(t *testing.T) {
+	tests := []struct {
+		name string
+		give RuleData
+		want string
+	}{
+		{
+			name: "minimal",
+			give: RuleData{
+				ID:   "abc-def",
+				Type: "rule",
+			},
+			want: heredoc.Doc(`
+				id: abc-def
+				type: rule
+				attributes:
+				  forward_params: null
+				  forward_path: null
+				  response_type: null
+				  source_urls: []
+				  target_url: null
+				relationships:
+				  source_hosts:
+					data: []
+					links:
+					  related: ""
+			`),
+		},
+		{
+			name: "empty",
+			give: RuleData{},
+			want: heredoc.Doc(`
+				id: ""
+				type: ""
+				attributes:
+				  forward_params: null
+				  forward_path: null
+				  response_type: null
+				  source_urls: []
+				  target_url: null
+				relationships:
+				  source_hosts:
+					data: []
+					links:
+					  related: ""
+			`),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.give
+			td.CmpString(t, got, strings.ReplaceAll(tt.want, "\t", "    "))
+		})
+	}
+}
+
+func TestRulesStringer(t *testing.T) {
+	tests := []struct {
+		name string
+		give Rules
+		want string
+	}{
+		{
+			name: "minimal",
+			give: Rules{
+				Data: []RuleData{
+					{
+						ID:   "abc-def",
+						Type: "rule",
+					},
+				},
+			},
+			want: heredoc.Doc(`
+				id: abc-def
+				type: rule
+				attributes:
+				  forward_params: null
+				  forward_path: null
+				  response_type: null
+				  source_urls: []
+				  target_url: null
+				relationships:
+				  source_hosts:
+					data: []
+					links:
+					  related: ""
+
+				Total: 1
+			`),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.give
+			td.CmpString(t, got, strings.ReplaceAll(tt.want, "\t", "    "))
 		})
 	}
 }
