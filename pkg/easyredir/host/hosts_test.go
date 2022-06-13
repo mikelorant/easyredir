@@ -1,4 +1,4 @@
-package easyredir
+package host
 
 import (
 	"fmt"
@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
+
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/maxatome/go-testdeep/td"
@@ -154,14 +156,14 @@ func TestListHosts(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Easyredir{
+			e := &easyredir.Easyredir{
 				Client: &mockClient{
 					data: tt.fields.data,
 				},
-				Config: &Config{},
+				Config: &easyredir.Config{},
 			}
 
-			got, err := e.ListHosts(tt.args.options...)
+			got, err := ListHosts(e, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -425,14 +427,14 @@ func TestListHostsPaginator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Easyredir{
+			e := &easyredir.Easyredir{
 				Client: &mockPaginatorClient{
 					data: tt.fields.data,
 				},
-				Config: &Config{},
+				Config: &easyredir.Config{},
 			}
 
-			got, err := e.ListHostsPaginator(tt.args.options...)
+			got, err := ListHostsPaginator(e, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -597,14 +599,14 @@ func TestGetHosts(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Easyredir{
+			e := &easyredir.Easyredir{
 				Client: &mockClient{
 					data: tt.fields.data,
 				},
-				Config: &Config{},
+				Config: &easyredir.Config{},
 			}
 
-			got, err := e.GetHost(tt.args.id)
+			got, err := GetHost(e, tt.args.id)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

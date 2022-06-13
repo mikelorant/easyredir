@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
@@ -40,34 +41,34 @@ func Run() error {
 }
 
 func listRules(e *easyredir.Easyredir) error {
-	rules, err := rule.ListRules(e, rule.WithLimit(100))
+	r, err := rule.ListRules(e, rule.WithLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list rules: %w", err)
 	}
 
-	fmt.Print(rules)
+	fmt.Print(r)
 
 	return nil
 }
 
 func listHosts(e *easyredir.Easyredir) error {
-	hosts, err := e.ListHostsPaginator(easyredir.WithHostsLimit(100))
+	h, err := host.ListHostsPaginator(e, host.WithHostsLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list hosts: %w", err)
 	}
 
-	fmt.Print(hosts)
+	fmt.Print(h)
 
 	return nil
 }
 
 func getHost(e *easyredir.Easyredir) error {
-	host, err := e.GetHost(os.Args[2])
+	h, err := host.GetHost(e, os.Args[2])
 	if err != nil {
 		return fmt.Errorf("unable to get host: %v: %w", os.Args[2], err)
 	}
 
-	fmt.Print(host)
+	fmt.Print(h)
 
 	return nil
 }

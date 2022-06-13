@@ -1,10 +1,13 @@
-package easyredir
+package host
 
 import (
 	"fmt"
+	"io"
+	"encoding/json"
 	"net/http"
 	"strings"
 
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
@@ -146,7 +149,7 @@ func WithHostsLimit(limit int) func(*HostsOptions) {
 	}
 }
 
-func (e *Easyredir) ListHostsPaginator(opts ...func(*HostsOptions)) (h Hosts, err error) {
+func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h Hosts, err error) {
 	h = Hosts{
 		Data: []HostData{},
 	}
@@ -158,7 +161,7 @@ func (e *Easyredir) ListHostsPaginator(opts ...func(*HostsOptions)) (h Hosts, er
 			optsWithPage = append(optsWithPage, hosts.NextPage())
 		}
 
-		hosts, err = e.ListHosts(optsWithPage...)
+		hosts, err = ListHosts(e, optsWithPage...)
 		if err != nil {
 			return h, fmt.Errorf("unable to get a hosts page: %w", err)
 		}
@@ -181,7 +184,7 @@ func (h *Hosts) HasMore() bool {
 	return h.Metadata.HasMore
 }
 
-func (e *Easyredir) ListHosts(opts ...func(*HostsOptions)) (h Hosts, err error) {
+func ListHosts(e *easyredir.Easyredir, opts ...func(*HostsOptions)) (h Hosts, err error) {
 	options := &HostsOptions{}
 	for _, o := range opts {
 		o(options)
@@ -252,7 +255,7 @@ func buildListHosts(opts *HostsOptions) string {
 	return sb.String()
 }
 
-func (e *Easyredir) GetHost(id string) (h Host, err error) {
+func GetHost(e *easyredir.Easyredir, id string) (h Host, err error) {
 	pathQuery := buildGetHost(id)
 	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
 	if err != nil {
@@ -272,4 +275,13 @@ func (e *Easyredir) GetHost(id string) (h Host, err error) {
 
 func buildGetHost(id string) string {
 	return fmt.Sprintf("/hosts/%v", id)
+}
+
+func decodeJSON(r io.ReadCloser, v interface{}) error {
+	if err := json.NewDecoder(r).Decode(v); err != nil {
+		return fmt.Errorf("unable to json decode: %w", err)
+	}
+	r.Close()
+
+	return nil
 }
