@@ -252,7 +252,7 @@ func TestListRules(t *testing.T) {
 	}
 }
 
-func TestListRulesPathQuery(t *testing.T) {
+func TestBuildListRules(t *testing.T) {
 	type Args struct {
 		options *RulesOptions
 	}
