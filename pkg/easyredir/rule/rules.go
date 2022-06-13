@@ -14,21 +14,7 @@ type Options struct {
 	sourceFilter string
 	targetFilter string
 	limit        int
-	pagination   Pagination
-}
-
-type Metadata struct {
-	HasMore bool `json:"has_more,omitempty"`
-}
-
-type Links struct {
-	Next string `json:"next,omitempty"`
-	Prev string `json:"prev,omitempty"`
-}
-
-type Pagination struct {
-	startingAfter string
-	endingBefore  string
+	pagination   easyredir.Pagination
 }
 
 func WithSourceFilter(url string) func(*Options) {
@@ -95,7 +81,7 @@ func ListRules(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err err
 
 func (r *Rules) NextPage() func(o *Options) {
 	return func(o *Options) {
-		o.pagination.startingAfter = strings.Split(r.Links.Next, "=")[1]
+		o.pagination.StartingAfter = strings.Split(r.Links.Next, "=")[1]
 	}
 }
 
@@ -109,12 +95,12 @@ func buildListRules(opts *Options) string {
 
 	fmt.Fprint(&sb, "/rules")
 
-	if opts.pagination.startingAfter != "" {
-		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.startingAfter))
+	if opts.pagination.StartingAfter != "" {
+		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.StartingAfter))
 	}
 
-	if opts.pagination.endingBefore != "" {
-		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.endingBefore))
+	if opts.pagination.EndingBefore != "" {
+		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.EndingBefore))
 	}
 
 	if opts.sourceFilter != "" {

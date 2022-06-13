@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
 type Hosts struct {
-	Data     []Data   `json:"data"`
-	Metadata Metadata `json:"meta"`
-	Links    Links    `json:"links"`
+	Data     []Data             `json:"data"`
+	Metadata easyredir.Metadata `json:"meta"`
+	Links    easyredir.Links    `json:"links"`
 }
 
 type Data struct {

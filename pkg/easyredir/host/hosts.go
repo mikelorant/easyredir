@@ -12,21 +12,7 @@ import (
 
 type Options struct {
 	limit      int
-	pagination Pagination
-}
-
-type Metadata struct {
-	HasMore bool `json:"has_more,omitempty"`
-}
-
-type Links struct {
-	Next string `json:"next,omitempty"`
-	Prev string `json:"prev,omitempty"`
-}
-
-type Pagination struct {
-	startingAfter string
-	endingBefore  string
+	pagination easyredir.Pagination
 }
 
 func WithHostsLimit(limit int) func(*Options) {
@@ -62,7 +48,7 @@ func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts
 
 func (h *Hosts) NextPage() func(o *Options) {
 	return func(o *Options) {
-		o.pagination.startingAfter = strings.Split(h.Links.Next, "=")[1]
+		o.pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
 	}
 }
 
@@ -95,12 +81,12 @@ func buildListHosts(opts *Options) string {
 
 	fmt.Fprint(&sb, "/hosts")
 
-	if opts.pagination.startingAfter != "" {
-		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.startingAfter))
+	if opts.pagination.StartingAfter != "" {
+		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.StartingAfter))
 	}
 
-	if opts.pagination.endingBefore != "" {
-		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.endingBefore))
+	if opts.pagination.EndingBefore != "" {
+		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.EndingBefore))
 	}
 
 	if opts.limit != 0 {

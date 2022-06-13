@@ -29,25 +29,6 @@ type Config struct {
 	APISecret string
 }
 
-type APIErrors struct {
-	Type    string     `json:"type"`
-	Message string     `json:"message"`
-	Errors  []APIError `json:"errors"`
-}
-
-type APIError struct {
-	Resource string `json:"resource"`
-	Param    string `json:"param"`
-	Code     string `json:"code"`
-	Message  string `json:"message"`
-}
-
-type RateLimitError struct {
-	Limit     string
-	Remaining string
-	Reset     string
-}
-
 const (
 	_BaseURL      = "https://api.easyredir.com/v1"
 	_ResourceType = "application/json; charset=utf-8"
@@ -67,18 +48,6 @@ func New(cfg *Config) *Easyredir {
 
 func (c *Easyredir) Ping() string {
 	return "pong"
-}
-
-func (err APIErrors) Error() string {
-	str := err.Type
-	if err.Message != "" {
-		str = fmt.Sprintf("%v: %v", str, err.Message)
-	}
-	return str
-}
-
-func (err RateLimitError) Error() string {
-	return fmt.Sprintf("rate limited with limit: %v, remaining: %v, reset: %v", err.Limit, err.Remaining, err.Reset)
 }
 
 func (cl *Client) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {

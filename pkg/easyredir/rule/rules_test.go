@@ -93,10 +93,10 @@ func TestListRules(t *testing.T) {
 							},
 						},
 					},
-					Metadata: Metadata{
+					Metadata: easyredir.Metadata{
 						HasMore: true,
 					},
-					Links: Links{
+					Links: easyredir.Links{
 						Next: "/v1/rules?starting_after=abc-def",
 						Prev: "/v1/rules?ending_before=abc-def",
 					},
@@ -280,8 +280,8 @@ func TestBuildListRules(t *testing.T) {
 			name: "starting_after",
 			args: Args{
 				options: &Options{
-					pagination: Pagination{
-						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
+					pagination: easyredir.Pagination{
+						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
 			},
@@ -292,8 +292,8 @@ func TestBuildListRules(t *testing.T) {
 			name: "ending_before",
 			args: Args{
 				options: &Options{
-					pagination: Pagination{
-						endingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
+					pagination: easyredir.Pagination{
+						EndingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
 				},
 			},
@@ -348,8 +348,8 @@ func TestBuildListRules(t *testing.T) {
 					sourceFilter: "http://www1.example.org",
 					targetFilter: "http://www2.example.org",
 					limit:        100,
-					pagination: Pagination{
-						startingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
+					pagination: easyredir.Pagination{
+						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
 			},
@@ -446,7 +446,7 @@ func TestListRulesPaginator(t *testing.T) {
 							Type: "rule",
 						},
 					},
-					Metadata: Metadata{
+					Metadata: easyredir.Metadata{
 						HasMore: false,
 					},
 				},
