@@ -77,8 +77,8 @@ func TestListRules(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 							Attributes: RuleAttributes{
 								ForwardParams: ptr.Bool(true),
 								ForwardPath:   ptr.Bool(true),
@@ -123,8 +123,8 @@ func TestListRules(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 				},
@@ -152,8 +152,8 @@ func TestListRules(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 				},
@@ -182,8 +182,8 @@ func TestListRules(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 				},
@@ -211,8 +211,8 @@ func TestListRules(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 				},
@@ -440,8 +440,8 @@ func TestListRulesPaginator(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 					Metadata: Metadata{
@@ -482,11 +482,11 @@ func TestListRulesPaginator(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						}, {
-							ID:   ptr.String("bcd-efg"),
-							Type: ptr.String("rule"),
+							ID:   "bcd-efg",
+							Type: "rule",
 						},
 					},
 				},
@@ -525,8 +525,8 @@ func TestListRulesPaginator(t *testing.T) {
 				rules: Rules{
 					Data: []RuleData{
 						{
-							ID:   ptr.String("abc-def"),
-							Type: ptr.String("rule"),
+							ID:   "abc-def",
+							Type: "rule",
 						},
 					},
 				},

@@ -16,8 +16,8 @@ type Rules struct {
 }
 
 type RuleData struct {
-	ID            *string        `json:"id"`
-	Type          *string        `json:"type"`
+	ID            string        `json:"id"`
+	Type          string        `json:"type"`
 	Attributes    RuleAttributes `json:"attributes"`
 	Relationships Relationships  `json:"relationships"`
 }
