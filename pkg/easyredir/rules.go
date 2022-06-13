@@ -18,16 +18,16 @@ type Rules struct {
 type RuleData struct {
 	ID            string         `json:"id"`
 	Type          string         `json:"type"`
-	Attributes    RuleAttributes `json:"attributes"`
-	Relationships Relationships  `json:"relationships"`
+	Attributes    RuleAttributes `json:"attributes,omitempty"`
+	Relationships Relationships  `json:"relationships,omitempty"`
 }
 
 type RuleAttributes struct {
-	ForwardParams *bool     `json:"forward_params"`
-	ForwardPath   *bool     `json:"forward_path"`
-	ResponseType  *string   `json:"response_type"`
-	SourceURLs    []*string `json:"source_urls"`
-	TargetURL     *string   `json:"target_url"`
+	ForwardParams *bool    `json:"forward_params,omitempty"`
+	ForwardPath   *bool    `json:"forward_path,omitempty"`
+	ResponseType  *string  `json:"response_type,omitempty"`
+	SourceURLs    []string `json:"source_urls,omitempty"`
+	TargetURL     *string  `json:"target_url,omitempty"`
 }
 
 type RulesResponseType string
@@ -38,30 +38,30 @@ const (
 )
 
 type Relationships struct {
-	SourceHosts SourceHosts `json:"source_hosts"`
+	SourceHosts SourceHosts `json:"source_hosts,omitempty"`
 }
 
 type SourceHosts struct {
-	Data  []SourceHostData `json:"data"`
-	Links SourceHostsLinks `json:"links"`
+	Data  []SourceHostData `json:"data,omitempty"`
+	Links SourceHostsLinks `json:"links,omitempty"`
 }
 
 type SourceHostData struct {
-	ID   string `json:"id"`
-	Type string `json:"type"`
+	ID   string `json:"id,omitempty"`
+	Type string `json:"type,omitempty"`
 }
 
 type SourceHostsLinks struct {
-	Related string `json:"related"`
+	Related string `json:"related,omitempty"`
 }
 
 type Metadata struct {
-	HasMore bool `json:"has_more"`
+	HasMore bool `json:"has_more,omitempty"`
 }
 
 type Links struct {
-	Next string `json:"next"`
-	Prev string `json:"prev"`
+	Next string `json:"next,omitempty"`
+	Prev string `json:"prev,omitempty"`
 }
 
 type Pagination struct {

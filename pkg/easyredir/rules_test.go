@@ -84,9 +84,9 @@ func TestListRules(t *testing.T) {
 								ForwardParams: ptr.Bool(true),
 								ForwardPath:   ptr.Bool(true),
 								ResponseType:  ptr.String("moved_permanently"),
-								SourceURLs: []*string{
-									ptr.String("abc.com"),
-									ptr.String("abc.com/123"),
+								SourceURLs: []string{
+									"abc.com",
+									"abc.com/123",
 								},
 								TargetURL: ptr.String("otherdomain.com"),
 							},
@@ -572,17 +572,35 @@ func TestRulesDataStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: abc-def
 				type: rule
+			`),
+		},
+		{
+			name: "typical",
+			give: RuleData{
+				ID:   "abc-def",
+				Type: "rule",
+				Attributes: RuleAttributes{
+					ForwardParams: ptr.Bool(true),
+					ForwardPath:   ptr.Bool(true),
+					ResponseType:  ptr.String("moved_permanently"),
+					SourceURLs: []string{
+						"http://www1.example.org",
+						"http://www2.example.org",
+					},
+					TargetURL: ptr.String("http://www3.example.org"),
+				},
+			},
+			want: heredoc.Doc(`
+				id: abc-def
+				type: rule
 				attributes:
-				  forward_params: null
-				  forward_path: null
-				  response_type: null
-				  source_urls: []
-				  target_url: null
-				relationships:
-				  source_hosts:
-					data: []
-					links:
-					  related: ""
+				  forward_params: true
+				  forward_path: true
+				  response_type: moved_permanently
+				  source_urls:
+				  - http://www1.example.org
+				  - http://www2.example.org
+				  target_url: http://www3.example.org
 			`),
 		},
 		{
@@ -591,17 +609,6 @@ func TestRulesDataStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: ""
 				type: ""
-				attributes:
-				  forward_params: null
-				  forward_path: null
-				  response_type: null
-				  source_urls: []
-				  target_url: null
-				relationships:
-				  source_hosts:
-					data: []
-					links:
-					  related: ""
 			`),
 		},
 	}
@@ -633,17 +640,6 @@ func TestRulesStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: abc-def
 				type: rule
-				attributes:
-				  forward_params: null
-				  forward_path: null
-				  response_type: null
-				  source_urls: []
-				  target_url: null
-				relationships:
-				  source_hosts:
-					data: []
-					links:
-					  related: ""
 
 				Total: 1
 			`),
