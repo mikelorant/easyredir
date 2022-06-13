@@ -13,7 +13,7 @@ func Run() error {
 		APISecret: os.Getenv("EASYREDIR_API_SECRET"),
 	})
 
-	rules, err := e.ListRulesPaginator(easyredir.WithLimit(100))
+	rules, err := e.ListRules(easyredir.WithLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list rules: %w", err)
 	}

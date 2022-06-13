@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/internal/structutil"
+	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
 type Rules struct {
@@ -88,25 +88,6 @@ func WithLimit(limit int) func(*RulesOptions) {
 }
 
 func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) {
-	options := &RulesOptions{}
-	for _, o := range opts {
-		o(options)
-	}
-
-	pathQuery := listRulesPathQuery(options)
-	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
-	if err != nil {
-		return r, fmt.Errorf("unable to send request: %w", err)
-	}
-
-	if err := decodeJSON(reader, &r); err != nil {
-		return r, fmt.Errorf("unable to get json: %w", err)
-	}
-
-	return r, nil
-}
-
-func (e *Easyredir) ListRulesPaginator(opts ...func(*RulesOptions)) (r Rules, err error) {
 	r = Rules{
 		Data: []RuleData{},
 	}
@@ -118,7 +99,7 @@ func (e *Easyredir) ListRulesPaginator(opts ...func(*RulesOptions)) (r Rules, er
 			optsWithPage = append(opts, rules.NextPage())
 		}
 
-		rules, err = e.ListRules(optsWithPage...)
+		rules, err = e.listRules(optsWithPage...)
 		if err != nil {
 			return r, fmt.Errorf("unable to get a rules page: %w", err)
 		}
@@ -126,6 +107,25 @@ func (e *Easyredir) ListRulesPaginator(opts ...func(*RulesOptions)) (r Rules, er
 		if !rules.Metadata.HasMore {
 			break
 		}
+	}
+
+	return r, nil
+}
+
+func (e *Easyredir) listRules(opts ...func(*RulesOptions)) (r Rules, err error) {
+	options := &RulesOptions{}
+	for _, o := range opts {
+		o(options)
+	}
+
+	pathQuery := buildListRules(options)
+	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
+	if err != nil {
+		return r, fmt.Errorf("unable to send request: %w", err)
+	}
+
+	if err := decodeJSON(reader, &r); err != nil {
+		return r, fmt.Errorf("unable to get json: %w", err)
 	}
 
 	return r, nil
@@ -141,7 +141,24 @@ func (r *Rules) HasMore() bool {
 	return r.Metadata.HasMore
 }
 
-func listRulesPathQuery(opts *RulesOptions) string {
+func (r RuleData) String() string {
+	str, _ := structutil.Sprint(r)
+
+	return str
+}
+
+func (r Rules) String() string {
+	ss := []string{}
+	i := 0
+	for _, v := range r.Data {
+		ss = append(ss, fmt.Sprint(v))
+		i++
+	}
+	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
+	return strings.Join(ss, "\n")
+}
+
+func buildListRules(opts *RulesOptions) string {
 	var sb strings.Builder
 	var params []string
 
@@ -172,21 +189,4 @@ func listRulesPathQuery(opts *RulesOptions) string {
 	}
 
 	return sb.String()
-}
-
-func (r RuleData) String() string {
-	str, _ := structutil.Sprint(r)
-
-	return str
-}
-
-func (r Rules) String() string {
-	ss := []string{}
-	i := 0
-	for _, v := range r.Data {
-		ss = append(ss, fmt.Sprint(v))
-		i++
-	}
-	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
-	return strings.Join(ss, "\n")
 }

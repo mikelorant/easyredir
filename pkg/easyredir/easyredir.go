@@ -81,15 +81,6 @@ func (err RateLimitError) Error() string {
 	return fmt.Sprintf("rate limited with limit: %v, remaining: %v, reset: %v", err.Limit, err.Remaining, err.Reset)
 }
 
-func decodeJSON(r io.ReadCloser, v interface{}) error {
-	if err := json.NewDecoder(r).Decode(v); err != nil {
-		return fmt.Errorf("unable to json decode: %w", err)
-	}
-	r.Close()
-
-	return nil
-}
-
 func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	url := fmt.Sprintf("%v%v", baseURL, path)
 
@@ -128,4 +119,13 @@ func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.
 	}
 
 	return resp.Body, nil
+}
+
+func decodeJSON(r io.ReadCloser, v interface{}) error {
+	if err := json.NewDecoder(r).Decode(v); err != nil {
+		return fmt.Errorf("unable to json decode: %w", err)
+	}
+	r.Close()
+
+	return nil
 }

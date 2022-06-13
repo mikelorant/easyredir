@@ -240,7 +240,7 @@ func TestListRules(t *testing.T) {
 				config: &Config{},
 			}
 
-			got, err := e.ListRules(tt.args.options...)
+			got, err := e.listRules(tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -359,7 +359,7 @@ func TestListRulesPathQuery(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := listRulesPathQuery(tt.args.options)
+			got := buildListRules(tt.args.options)
 			td.Cmp(t, got, tt.want.pathQuery)
 		})
 	}
@@ -544,7 +544,7 @@ func TestListRulesPaginator(t *testing.T) {
 				config: &Config{},
 			}
 
-			got, err := e.ListRulesPaginator(tt.args.options...)
+			got, err := e.ListRules(tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
