@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
 func Run() error {
@@ -39,7 +40,7 @@ func Run() error {
 }
 
 func listRules(e *easyredir.Easyredir) error {
-	rules, err := e.ListRules(easyredir.WithLimit(100))
+	rules, err := rule.ListRules(e, rule.WithLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list rules: %w", err)
 	}

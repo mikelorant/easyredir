@@ -1,4 +1,4 @@
-package easyredir
+package rule
 
 import (
 	"encoding/json"
@@ -6,6 +6,8 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/gotidy/ptr"
@@ -17,7 +19,7 @@ type mockClient struct {
 	data string
 }
 
-func (m *mockClient) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	r := strings.NewReader(m.data)
 	rc := io.NopCloser(r)
 	return rc, nil
@@ -234,14 +236,14 @@ func TestListRules(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Easyredir{
-				client: &mockClient{
+			e := &easyredir.Easyredir{
+				Client: &mockClient{
 					data: tt.fields.data,
 				},
-				config: &Config{},
+				Config: &easyredir.Config{},
 			}
 
-			got, err := e.listRules(tt.args.options...)
+			got, err := ListRules(e, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -371,7 +373,7 @@ type mockPaginatorClient struct {
 	data string
 }
 
-func (m *mockPaginatorClient) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	data := strings.NewReader(m.data)
 	docs := make(map[int]interface{})
 	dec := json.NewDecoder(data)
@@ -538,14 +540,14 @@ func TestListRulesPaginator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &Easyredir{
-				client: &mockPaginatorClient{
+			e := &easyredir.Easyredir{
+				Client: &mockPaginatorClient{
 					data: tt.fields.data,
 				},
-				config: &Config{},
+				Config: &easyredir.Config{},
 			}
 
-			got, err := e.ListRules(tt.args.options...)
+			got, err := ListRulesPaginator(e, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

@@ -216,7 +216,7 @@ func TestSendRequest(t *testing.T) {
 			defer server.Close()
 
 			e := New(&Config{})
-			r, err := e.client.sendRequest(server.URL, path, method, body)
+			r, err := e.Client.SendRequest(server.URL, path, method, body)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

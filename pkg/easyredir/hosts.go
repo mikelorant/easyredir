@@ -126,6 +126,20 @@ const (
 	HostCertificateStatusAAAARecordPresent          HostCertificateStatus = "aaaa_record_present"
 )
 
+type Metadata struct {
+	HasMore bool `json:"has_more,omitempty"`
+}
+
+type Links struct {
+	Next string `json:"next,omitempty"`
+	Prev string `json:"prev,omitempty"`
+}
+
+type Pagination struct {
+	startingAfter string
+	endingBefore  string
+}
+
 func WithHostsLimit(limit int) func(*HostsOptions) {
 	return func(o *HostsOptions) {
 		o.limit = limit
@@ -174,7 +188,7 @@ func (e *Easyredir) ListHosts(opts ...func(*HostsOptions)) (h Hosts, err error) 
 	}
 
 	pathQuery := buildListHosts(options)
-	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
+	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return h, fmt.Errorf("unable to send request: %w", err)
 	}
@@ -240,7 +254,7 @@ func buildListHosts(opts *HostsOptions) string {
 
 func (e *Easyredir) GetHost(id string) (h Host, err error) {
 	pathQuery := buildGetHost(id)
-	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
+	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return h, fmt.Errorf("unable to send request: %w", err)
 	}

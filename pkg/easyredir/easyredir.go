@@ -6,16 +6,18 @@ import (
 	"io"
 	"net/http"
 
+
+
 	"github.com/google/uuid"
 )
 
 type Easyredir struct {
-	client ClientAPI
-	config *Config
+	Client ClientAPI
+	Config *Config
 }
 
 type ClientAPI interface {
-	sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
+	SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
 type Client struct {
@@ -24,7 +26,7 @@ type Client struct {
 }
 
 type Config struct {
-	baseURL   string
+	BaseURL   string
 	APIKey    string
 	APISecret string
 }
@@ -54,14 +56,14 @@ const (
 )
 
 func New(cfg *Config) *Easyredir {
-	cfg.baseURL = _BaseURL
+	cfg.BaseURL = _BaseURL
 
 	return &Easyredir{
-		client: &Client{
+		Client: &Client{
 			httpClient: &http.Client{},
 			config:     cfg,
 		},
-		config: cfg,
+		Config: cfg,
 	}
 }
 
@@ -81,7 +83,7 @@ func (err RateLimitError) Error() string {
 	return fmt.Sprintf("rate limited with limit: %v, remaining: %v, reset: %v", err.Limit, err.Remaining, err.Reset)
 }
 
-func (cl *Client) sendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+func (cl *Client) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
 	url := fmt.Sprintf("%v%v", baseURL, path)
 
 	req, err := http.NewRequest(method, url, body)

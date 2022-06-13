@@ -1,10 +1,13 @@
-package easyredir
+package rule
 
 import (
 	"fmt"
+	"io"
+	"encoding/json"
 	"net/http"
 	"strings"
 
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
@@ -94,7 +97,7 @@ func WithLimit(limit int) func(*RulesOptions) {
 	}
 }
 
-func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) {
+func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r Rules, err error) {
 	r = Rules{
 		Data: []RuleData{},
 	}
@@ -106,7 +109,7 @@ func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) 
 			optsWithPage = append(optsWithPage, rules.NextPage())
 		}
 
-		rules, err = e.listRules(optsWithPage...)
+		rules, err = ListRules(e, optsWithPage...)
 		if err != nil {
 			return r, fmt.Errorf("unable to get a rules page: %w", err)
 		}
@@ -119,14 +122,14 @@ func (e *Easyredir) ListRules(opts ...func(*RulesOptions)) (r Rules, err error) 
 	return r, nil
 }
 
-func (e *Easyredir) listRules(opts ...func(*RulesOptions)) (r Rules, err error) {
+func ListRules(e *easyredir.Easyredir, opts ...func(*RulesOptions)) (r Rules, err error) {
 	options := &RulesOptions{}
 	for _, o := range opts {
 		o(options)
 	}
 
 	pathQuery := buildListRules(options)
-	reader, err := e.client.sendRequest(e.config.baseURL, pathQuery, http.MethodGet, nil)
+	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return r, fmt.Errorf("unable to send request: %w", err)
 	}
@@ -196,4 +199,13 @@ func buildListRules(opts *RulesOptions) string {
 	}
 
 	return sb.String()
+}
+
+func decodeJSON(r io.ReadCloser, v interface{}) error {
+	if err := json.NewDecoder(r).Decode(v); err != nil {
+		return fmt.Errorf("unable to json decode: %w", err)
+	}
+	r.Close()
+
+	return nil
 }

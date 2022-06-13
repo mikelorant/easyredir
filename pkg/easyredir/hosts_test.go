@@ -1,6 +1,9 @@
 package easyredir
 
 import (
+	"fmt"
+	"io"
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -8,6 +11,16 @@ import (
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/assert"
 )
+
+type mockClient struct {
+	data string
+}
+
+func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+	r := strings.NewReader(m.data)
+	rc := io.NopCloser(r)
+	return rc, nil
+}
 
 func TestListHosts(t *testing.T) {
 	type Args struct {
@@ -142,10 +155,10 @@ func TestListHosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Easyredir{
-				client: &mockClient{
+				Client: &mockClient{
 					data: tt.fields.data,
 				},
-				config: &Config{},
+				Config: &Config{},
 			}
 
 			got, err := e.ListHosts(tt.args.options...)
@@ -238,6 +251,43 @@ func TestBuildListHosts(t *testing.T) {
 			td.Cmp(t, got, tt.want.pathQuery)
 		})
 	}
+}
+
+type mockPaginatorClient struct {
+	idx  int
+	data string
+}
+
+func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+	data := strings.NewReader(m.data)
+	docs := make(map[int]interface{})
+	dec := json.NewDecoder(data)
+
+	i := 0
+	for {
+		var doc map[string]interface{}
+		err := dec.Decode(&doc)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("unable to decode json page %v: %w", i, err)
+		}
+		docs[i] = doc
+		i++
+	}
+
+	b, err := json.Marshal(docs[m.idx])
+	if err != nil {
+		return nil, fmt.Errorf("unable to encode json page %v: %w", i, err)
+	}
+
+	r := strings.NewReader(string(b))
+	rc := io.NopCloser(r)
+
+	m.idx++
+
+	return rc, nil
 }
 
 func TestListHostsPaginator(t *testing.T) {
@@ -376,10 +426,10 @@ func TestListHostsPaginator(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Easyredir{
-				client: &mockPaginatorClient{
+				Client: &mockPaginatorClient{
 					data: tt.fields.data,
 				},
-				config: &Config{},
+				Config: &Config{},
 			}
 
 			got, err := e.ListHostsPaginator(tt.args.options...)
@@ -548,10 +598,10 @@ func TestGetHosts(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &Easyredir{
-				client: &mockClient{
+				Client: &mockClient{
 					data: tt.fields.data,
 				},
-				config: &Config{},
+				Config: &Config{},
 			}
 
 			got, err := e.GetHost(tt.args.id)
