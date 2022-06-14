@@ -1,24 +1,24 @@
 package rule
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
 type ClientAPI interface {
-	SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
+	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
 type ConfigAPI interface {
 	BaseURL() string
 }
 
-func ListRulesPaginator(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (r Rules, err error) {
+func ListRulesPaginator(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},
 	}
@@ -30,7 +30,7 @@ func ListRulesPaginator(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Option
 			optsWithPage = append(optsWithPage, rules.NextPage())
 		}
 
-		rules, err = ListRules(cl, cfg, optsWithPage...)
+		rules, err = ListRules(cl, optsWithPage...)
 		if err != nil {
 			return r, fmt.Errorf("unable to get a rules page: %w", err)
 		}
@@ -43,19 +43,19 @@ func ListRulesPaginator(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Option
 	return r, nil
 }
 
-func ListRules(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (r Rules, err error) {
+func ListRules(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error) {
 	options := &option.Options{}
 	for _, o := range opts {
 		o(options)
 	}
 
 	pathQuery := buildListRules(options)
-	reader, err := cl.SendRequest(cfg.BaseURL(), pathQuery, http.MethodGet, nil)
+	reader, err := cl.SendRequest(pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return r, fmt.Errorf("unable to send request: %w", err)
 	}
 
-	if err := decodeJSON(reader, &r); err != nil {
+	if err := jsonutil.DecodeJSON(reader, &r); err != nil {
 		return r, fmt.Errorf("unable to get json: %w", err)
 	}
 
@@ -103,13 +103,4 @@ func buildListRules(opts *option.Options) string {
 	}
 
 	return sb.String()
-}
-
-func decodeJSON(r io.ReadCloser, v interface{}) error {
-	if err := json.NewDecoder(r).Decode(v); err != nil {
-		return fmt.Errorf("unable to json decode: %w", err)
-	}
-	r.Close()
-
-	return nil
 }

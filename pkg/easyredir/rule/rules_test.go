@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/config"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
 
@@ -20,7 +19,7 @@ type mockClient struct {
 	data string
 }
 
-func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+func (m *mockClient) SendRequest(path, method string, body io.Reader) (io.ReadCloser, error) {
 	r := strings.NewReader(m.data)
 	rc := io.NopCloser(r)
 	return rc, nil
@@ -240,9 +239,8 @@ func TestListRules(t *testing.T) {
 			cl := &mockClient{
 				data: tt.fields.data,
 			}
-			cfg := config.New("", "")
 
-			got, err := ListRules(cl, cfg, tt.args.options...)
+			got, err := ListRules(cl, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -372,7 +370,7 @@ type mockPaginatorClient struct {
 	data string
 }
 
-func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
+func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (io.ReadCloser, error) {
 	data := strings.NewReader(m.data)
 	docs := make(map[int]interface{})
 	dec := json.NewDecoder(data)
@@ -542,9 +540,8 @@ func TestListRulesPaginator(t *testing.T) {
 			cl := &mockPaginatorClient{
 				data: tt.fields.data,
 			}
-			cfg := config.New("", "")
 
-			got, err := ListRulesPaginator(cl, cfg, tt.args.options...)
+			got, err := ListRulesPaginator(cl, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

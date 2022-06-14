@@ -6,45 +6,56 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/config"
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
 type Client struct {
-	httpClient *http.Client
-	username   string
-	password   string
+	HTTPClient *http.Client
+	Config     *Config
+}
+
+type Config struct {
+	BaseURL   string
+	APIKey    string
+	APISecret string
 }
 
 const (
-	_ResourceType = "application/json; charset=utf-8"
+	BaseURL = "https://api.easyredir.com/v1"
 )
 
-func New(cfg *config.Config) *Client {
+const (
+	ResourceType = "application/json; charset=utf-8"
+)
+
+func New(cfg *Config) *Client {
+	if cfg.BaseURL == "" {
+		cfg.BaseURL = BaseURL
+	}
+
 	return &Client{
-		httpClient: &http.Client{},
-		username:   cfg.APIKey(),
-		password:   cfg.APISecret(),
+		HTTPClient: &http.Client{},
+		Config:     cfg,
 	}
 }
 
-func (cl *Client) SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error) {
-	url := fmt.Sprintf("%v%v", baseURL, path)
+func (cl *Client) SendRequest(path, method string, body io.Reader) (io.ReadCloser, error) {
+	url := fmt.Sprintf("%v%v", cl.Config.BaseURL, path)
 
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create a new request: %w", err)
 	}
 
-	req.SetBasicAuth(cl.username, cl.password)
-	req.Header.Set("Content-Type", _ResourceType)
-	req.Header.Set("Accept", _ResourceType)
+	req.SetBasicAuth(cl.Config.APIKey, cl.Config.APISecret)
+	req.Header.Set("Content-Type", ResourceType)
+	req.Header.Set("Accept", ResourceType)
 
 	if req.Method == "POST" || req.Method == "PUT" || req.Method == "PATCH" {
 		req.Header.Set("Idempotency-Key", uuid.NewString())
 	}
 
-	resp, err := cl.httpClient.Do(req)
+	resp, err := cl.HTTPClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to do request: %w", err)
 	}

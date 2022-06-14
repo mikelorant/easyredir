@@ -1,4 +1,4 @@
-package easyredir
+package client
 
 import (
 	"io"
@@ -8,31 +8,8 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/config"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestPing(t *testing.T) {
-	tests := []struct {
-		name string
-		want string
-	}{
-		{
-			name: "ping",
-			want: "pong",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			e := New("", "")
-
-			got := e.Ping()
-			td.Cmp(t, got, tt.want)
-		})
-	}
-}
 
 func TestSendRequest(t *testing.T) {
 	type Fields struct {
@@ -135,10 +112,11 @@ func TestSendRequest(t *testing.T) {
 			}))
 			defer server.Close()
 
-			cfg := config.New("", "")
-			cl := client.New(cfg)
+			cl := New(&Config{
+				BaseURL: server.URL,
+			})
 
-			r, err := cl.SendRequest(server.URL, path, method, body)
+			r, err := cl.SendRequest(path, method, body)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
