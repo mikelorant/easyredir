@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -112,9 +113,7 @@ func TestSendRequest(t *testing.T) {
 			}))
 			defer server.Close()
 
-			cl := New(&Config{
-				BaseURL: server.URL,
-			})
+			cl := New(option.WithBaseURL(server.URL))
 
 			r, err := cl.SendRequest(path, method, body)
 			if tt.want.err != "" {

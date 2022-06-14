@@ -6,11 +6,16 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
+type Doer interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
 type Client struct {
-	HTTPClient *http.Client
+	HTTPClient Doer
 	Config     *Config
 }
 
@@ -28,14 +33,15 @@ const (
 	ResourceType = "application/json; charset=utf-8"
 )
 
-func New(cfg *Config) *Client {
-	if cfg.BaseURL == "" {
-		cfg.BaseURL = BaseURL
+func New(opts ...func(*option.Options)) *Client {
+	options := &option.Options{}
+	for _, o := range opts {
+		o(options)
 	}
 
 	return &Client{
-		HTTPClient: &http.Client{},
-		Config:     cfg,
+		HTTPClient: buildHTTPClient(options),
+		Config:     buildConfig(options),
 	}
 }
 
@@ -77,4 +83,32 @@ func (cl *Client) SendRequest(path, method string, body io.Reader) (io.ReadClose
 	}
 
 	return resp.Body, nil
+}
+
+func buildConfig(opts *option.Options) *Config {
+	cfg := &Config{
+		BaseURL: BaseURL,
+	}
+
+	if opts.BaseURL != "" {
+		cfg.BaseURL = opts.BaseURL
+	}
+
+	if opts.APIKey != "" {
+		cfg.APIKey = opts.APIKey
+	}
+
+	if opts.APISecret != "" {
+		cfg.APISecret = opts.APISecret
+	}
+
+	return cfg
+}
+
+func buildHTTPClient(opts *option.Options) Doer {
+	if opts.HTTPClient != nil {
+		return opts.HTTPClient
+	}
+
+	return http.DefaultClient
 }

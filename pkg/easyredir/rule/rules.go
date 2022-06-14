@@ -14,10 +14,6 @@ type ClientAPI interface {
 	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
-type ConfigAPI interface {
-	BaseURL() string
-}
-
 func ListRulesPaginator(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},

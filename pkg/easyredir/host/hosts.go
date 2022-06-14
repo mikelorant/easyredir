@@ -14,10 +14,6 @@ type ClientAPI interface {
 	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
-type ConfigAPI interface {
-	BaseURL() string
-}
-
 func ListHostsPaginator(cl ClientAPI, opts ...func(*option.Options)) (h Hosts, err error) {
 	h = Hosts{
 		Data: []Data{},
