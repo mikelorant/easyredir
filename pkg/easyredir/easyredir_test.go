@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/config"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,92 +26,10 @@ func TestPing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := New(&Config{})
+			e := New("", "")
 
-			got := cl.Ping()
+			got := e.Ping()
 			td.Cmp(t, got, tt.want)
-		})
-	}
-}
-
-func TestDecodeJSON(t *testing.T) {
-	type Data struct {
-		Key string `json:"key"`
-	}
-
-	type Args struct {
-		src io.Reader
-		dst Data
-	}
-
-	type Want struct {
-		dst Data
-		err string
-	}
-
-	tests := []struct {
-		name string
-		args Args
-		want Want
-	}{
-		{
-			name: "exactfields",
-			args: Args{
-				src: strings.NewReader(`{ "Key": "Value" }`),
-				dst: Data{},
-			},
-			want: Want{
-				dst: Data{
-					Key: "Value",
-				},
-			},
-		},
-		{
-			name: "extrafields",
-			args: Args{
-				src: strings.NewReader(`{ "Key": "Value", "Key2": "Value2" }`),
-				dst: Data{},
-			},
-			want: Want{
-				dst: Data{
-					Key: "Value",
-				},
-			},
-		},
-		{
-			name: "nofields",
-			args: Args{
-				src: strings.NewReader(`{}`),
-				dst: Data{},
-			},
-			want: Want{
-				dst: Data{},
-			},
-		},
-		{
-			name: "notjson",
-			args: Args{
-				src: strings.NewReader(`not json`),
-				dst: Data{},
-			},
-			want: Want{
-				dst: Data{},
-				err: "unable to json decode",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := Data{}
-			err := decodeJSON(io.NopCloser(tt.args.src), &got)
-			if tt.want.err != "" {
-				assert.NotNil(t, err)
-				td.CmpContains(t, err, tt.want.err)
-				return
-			}
-			assert.Nil(t, err)
-			td.Cmp(t, got, tt.want.dst)
 		})
 	}
 }
@@ -215,8 +135,10 @@ func TestSendRequest(t *testing.T) {
 			}))
 			defer server.Close()
 
-			e := New(&Config{})
-			r, err := e.Client.SendRequest(server.URL, path, method, body)
+			cfg := config.New("", "")
+			cl := client.New(cfg)
+
+			r, err := cl.SendRequest(server.URL, path, method, body)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)

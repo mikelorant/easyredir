@@ -7,10 +7,18 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 )
 
-func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (h Hosts, err error) {
+type ClientAPI interface {
+	SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
+}
+
+type ConfigAPI interface {
+	BaseURL() string
+}
+
+func ListHostsPaginator(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (h Hosts, err error) {
 	h = Hosts{
 		Data: []Data{},
 	}
@@ -22,7 +30,7 @@ func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)
 			optsWithPage = append(optsWithPage, hosts.NextPage())
 		}
 
-		hosts, err = ListHosts(e, optsWithPage...)
+		hosts, err = ListHosts(cl, cfg, optsWithPage...)
 		if err != nil {
 			return h, fmt.Errorf("unable to get a hosts page: %w", err)
 		}
@@ -35,8 +43,8 @@ func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)
 	return h, nil
 }
 
-func (h *Hosts) NextPage() func(o *easyredir.Options) {
-	return func(o *easyredir.Options) {
+func (h *Hosts) NextPage() func(o *option.Options) {
+	return func(o *option.Options) {
 		o.Pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
 	}
 }
@@ -45,14 +53,14 @@ func (h *Hosts) HasMore() bool {
 	return h.Metadata.HasMore
 }
 
-func ListHosts(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (h Hosts, err error) {
-	options := &easyredir.Options{}
+func ListHosts(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (h Hosts, err error) {
+	options := &option.Options{}
 	for _, o := range opts {
 		o(options)
 	}
 
 	pathQuery := buildListHosts(options)
-	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
+	reader, err := cl.SendRequest(cfg.BaseURL(), pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return h, fmt.Errorf("unable to send request: %w", err)
 	}
@@ -64,7 +72,7 @@ func ListHosts(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (h Host
 	return h, nil
 }
 
-func buildListHosts(opts *easyredir.Options) string {
+func buildListHosts(opts *option.Options) string {
 	var sb strings.Builder
 	var params []string
 
@@ -89,9 +97,9 @@ func buildListHosts(opts *easyredir.Options) string {
 	return sb.String()
 }
 
-func GetHost(e *easyredir.Easyredir, id string) (h Host, err error) {
+func GetHost(cl ClientAPI, cfg ConfigAPI, id string) (h Host, err error) {
 	pathQuery := buildGetHost(id)
-	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
+	reader, err := cl.SendRequest(cfg.BaseURL(), pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return h, fmt.Errorf("unable to send request: %w", err)
 	}
