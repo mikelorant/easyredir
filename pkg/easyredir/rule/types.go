@@ -9,7 +9,7 @@ import (
 )
 
 type Rules struct {
-	Data     []Data             `json:"data"`
+	Data     []Data              `json:"data"`
 	Metadata pagination.Metadata `json:"meta"`
 	Links    pagination.Links    `json:"links"`
 }

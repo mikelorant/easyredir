@@ -83,7 +83,7 @@ func TestListHosts(t *testing.T) {
 								DNSStatus:         "active",
 								CertificateStatus: "active",
 							},
-							Links: HostLinks{
+							Links: Links{
 								Self: "/v1/hosts/abc-def",
 							},
 						},

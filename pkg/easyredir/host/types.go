@@ -9,7 +9,7 @@ import (
 )
 
 type Hosts struct {
-	Data     []Data             `json:"data"`
+	Data     []Data              `json:"data"`
 	Metadata pagination.Metadata `json:"meta"`
 	Links    pagination.Links    `json:"links"`
 }
@@ -18,7 +18,7 @@ type Data struct {
 	ID         string     `json:"id"`
 	Type       string     `json:"type"`
 	Attributes Attributes `json:"attributes"`
-	Links      HostLinks  `json:"links"`
+	Links      Links      `json:"links"`
 }
 
 type Attributes struct {
@@ -27,7 +27,7 @@ type Attributes struct {
 	CertificateStatus CertificateStatus `json:"certificate_status"`
 }
 
-type HostLinks struct {
+type Links struct {
 	Self string `json:"self"`
 }
 
@@ -39,7 +39,7 @@ type DataExtended struct {
 	ID         string             `json:"id"`
 	Type       string             `json:"type"`
 	Attributes AttributesExtended `json:"attributes"`
-	Links      HostLinks          `json:"links"`
+	Links      Links              `json:"links"`
 }
 
 type AttributesExtended struct {

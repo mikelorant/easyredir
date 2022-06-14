@@ -23,8 +23,8 @@ const (
 func New(cfg *config.Config) *Client {
 	return &Client{
 		httpClient: &http.Client{},
-		username: cfg.APIKey(),
-		password: cfg.APISecret(),
+		username:   cfg.APIKey(),
+		password:   cfg.APISecret(),
 	}
 }
 

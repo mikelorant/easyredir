@@ -12,9 +12,9 @@ const (
 
 func New(key, secret string) *Config {
 	return &Config{
-		apiKey: key,
+		apiKey:    key,
 		apiSecret: secret,
-		baseURL: _BaseURL,
+		baseURL:   _BaseURL,
 	}
 }
 
