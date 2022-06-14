@@ -90,6 +90,24 @@ func (cl *Client) SendRequest(baseURL, path, method string, body io.Reader) (io.
 	return resp.Body, nil
 }
 
+func WithLimit(limit int) func(*Options) {
+	return func(o *Options) {
+		o.Limit = limit
+	}
+}
+
+func WithSourceFilter(url string) func(*Options) {
+	return func(o *Options) {
+		o.SourceFilter = url
+	}
+}
+
+func WithTargetFilter(url string) func(*Options) {
+	return func(o *Options) {
+		o.TargetFilter = url
+	}
+}
+
 func decodeJSON(r io.ReadCloser, v interface{}) error {
 	if err := json.NewDecoder(r).Decode(v); err != nil {
 		return fmt.Errorf("unable to json decode: %w", err)

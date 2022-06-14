@@ -25,7 +25,7 @@ func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (
 
 func TestListHosts(t *testing.T) {
 	type Args struct {
-		options []func(*Options)
+		options []func(*easyredir.Options)
 	}
 	type Fields struct {
 		data string
@@ -124,8 +124,8 @@ func TestListHosts(t *testing.T) {
 		{
 			name: "with_limit",
 			args: Args{
-				options: []func(*Options){
-					WithHostsLimit(1),
+				options: []func(*easyredir.Options){
+					easyredir.WithLimit(1),
 				},
 			},
 			fields: Fields{
@@ -176,7 +176,7 @@ func TestListHosts(t *testing.T) {
 
 func TestBuildListHosts(t *testing.T) {
 	type Args struct {
-		options *Options
+		options *easyredir.Options
 	}
 
 	type Want struct {
@@ -191,7 +191,7 @@ func TestBuildListHosts(t *testing.T) {
 		{
 			name: "no_options",
 			args: Args{
-				options: &Options{},
+				options: &easyredir.Options{},
 			},
 			want: Want{
 				pathQuery: "/hosts",
@@ -199,8 +199,8 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "starting_after",
 			args: Args{
-				options: &Options{
-					pagination: easyredir.Pagination{
+				options: &easyredir.Options{
+					Pagination: easyredir.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -211,8 +211,8 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "ending_before",
 			args: Args{
-				options: &Options{
-					pagination: easyredir.Pagination{
+				options: &easyredir.Options{
+					Pagination: easyredir.Pagination{
 						EndingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
 				},
@@ -223,8 +223,8 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "limit",
 			args: Args{
-				options: &Options{
-					limit: 100,
+				options: &easyredir.Options{
+					Limit: 100,
 				},
 			},
 			want: Want{
@@ -233,9 +233,9 @@ func TestBuildListHosts(t *testing.T) {
 		}, {
 			name: "all",
 			args: Args{
-				options: &Options{
-					limit: 100,
-					pagination: easyredir.Pagination{
+				options: &easyredir.Options{
+					Limit: 100,
+					Pagination: easyredir.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -293,7 +293,7 @@ func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.
 
 func TestListHostsPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*Options)
+		options []func(*easyredir.Options)
 	}
 
 	type Fields struct {

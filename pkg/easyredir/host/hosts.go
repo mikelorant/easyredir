@@ -10,18 +10,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 )
 
-type Options struct {
-	limit      int
-	pagination easyredir.Pagination
-}
-
-func WithHostsLimit(limit int) func(*Options) {
-	return func(o *Options) {
-		o.limit = limit
-	}
-}
-
-func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts, err error) {
+func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (h Hosts, err error) {
 	h = Hosts{
 		Data: []Data{},
 	}
@@ -46,9 +35,9 @@ func ListHostsPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts
 	return h, nil
 }
 
-func (h *Hosts) NextPage() func(o *Options) {
-	return func(o *Options) {
-		o.pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
+func (h *Hosts) NextPage() func(o *easyredir.Options) {
+	return func(o *easyredir.Options) {
+		o.Pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
 	}
 }
 
@@ -56,8 +45,8 @@ func (h *Hosts) HasMore() bool {
 	return h.Metadata.HasMore
 }
 
-func ListHosts(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts, err error) {
-	options := &Options{}
+func ListHosts(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (h Hosts, err error) {
+	options := &easyredir.Options{}
 	for _, o := range opts {
 		o(options)
 	}
@@ -75,22 +64,22 @@ func ListHosts(e *easyredir.Easyredir, opts ...func(*Options)) (h Hosts, err err
 	return h, nil
 }
 
-func buildListHosts(opts *Options) string {
+func buildListHosts(opts *easyredir.Options) string {
 	var sb strings.Builder
 	var params []string
 
 	fmt.Fprint(&sb, "/hosts")
 
-	if opts.pagination.StartingAfter != "" {
-		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.StartingAfter))
+	if opts.Pagination.StartingAfter != "" {
+		params = append(params, fmt.Sprintf("starting_after=%v", opts.Pagination.StartingAfter))
 	}
 
-	if opts.pagination.EndingBefore != "" {
-		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.EndingBefore))
+	if opts.Pagination.EndingBefore != "" {
+		params = append(params, fmt.Sprintf("ending_before=%v", opts.Pagination.EndingBefore))
 	}
 
-	if opts.limit != 0 {
-		params = append(params, fmt.Sprintf("limit=%v", opts.limit))
+	if opts.Limit != 0 {
+		params = append(params, fmt.Sprintf("limit=%v", opts.Limit))
 	}
 
 	if len(params) != 0 {

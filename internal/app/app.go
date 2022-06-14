@@ -41,7 +41,7 @@ func Run() error {
 }
 
 func listRules(e *easyredir.Easyredir) error {
-	r, err := rule.ListRules(e, rule.WithLimit(100))
+	r, err := rule.ListRules(e, easyredir.WithLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list rules: %w", err)
 	}
@@ -52,7 +52,7 @@ func listRules(e *easyredir.Easyredir) error {
 }
 
 func listHosts(e *easyredir.Easyredir) error {
-	h, err := host.ListHostsPaginator(e, host.WithHostsLimit(100))
+	h, err := host.ListHostsPaginator(e, easyredir.WithLimit(100))
 	if err != nil {
 		return fmt.Errorf("unable to list hosts: %w", err)
 	}

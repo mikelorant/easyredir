@@ -10,32 +10,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
 )
 
-type Options struct {
-	sourceFilter string
-	targetFilter string
-	limit        int
-	pagination   easyredir.Pagination
-}
-
-func WithSourceFilter(url string) func(*Options) {
-	return func(o *Options) {
-		o.sourceFilter = url
-	}
-}
-
-func WithTargetFilter(url string) func(*Options) {
-	return func(o *Options) {
-		o.targetFilter = url
-	}
-}
-
-func WithLimit(limit int) func(*Options) {
-	return func(o *Options) {
-		o.limit = limit
-	}
-}
-
-func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err error) {
+func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},
 	}
@@ -60,8 +35,8 @@ func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules
 	return r, nil
 }
 
-func ListRules(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err error) {
-	options := &Options{}
+func ListRules(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (r Rules, err error) {
+	options := &easyredir.Options{}
 	for _, o := range opts {
 		o(options)
 	}
@@ -79,9 +54,9 @@ func ListRules(e *easyredir.Easyredir, opts ...func(*Options)) (r Rules, err err
 	return r, nil
 }
 
-func (r *Rules) NextPage() func(o *Options) {
-	return func(o *Options) {
-		o.pagination.StartingAfter = strings.Split(r.Links.Next, "=")[1]
+func (r *Rules) NextPage() func(o *easyredir.Options) {
+	return func(o *easyredir.Options) {
+		o.Pagination.StartingAfter = strings.Split(r.Links.Next, "=")[1]
 	}
 }
 
@@ -89,30 +64,30 @@ func (r *Rules) HasMore() bool {
 	return r.Metadata.HasMore
 }
 
-func buildListRules(opts *Options) string {
+func buildListRules(opts *easyredir.Options) string {
 	var sb strings.Builder
 	var params []string
 
 	fmt.Fprint(&sb, "/rules")
 
-	if opts.pagination.StartingAfter != "" {
-		params = append(params, fmt.Sprintf("starting_after=%v", opts.pagination.StartingAfter))
+	if opts.Pagination.StartingAfter != "" {
+		params = append(params, fmt.Sprintf("starting_after=%v", opts.Pagination.StartingAfter))
 	}
 
-	if opts.pagination.EndingBefore != "" {
-		params = append(params, fmt.Sprintf("ending_before=%v", opts.pagination.EndingBefore))
+	if opts.Pagination.EndingBefore != "" {
+		params = append(params, fmt.Sprintf("ending_before=%v", opts.Pagination.EndingBefore))
 	}
 
-	if opts.sourceFilter != "" {
-		params = append(params, fmt.Sprintf("sq=%v", opts.sourceFilter))
+	if opts.SourceFilter != "" {
+		params = append(params, fmt.Sprintf("sq=%v", opts.SourceFilter))
 	}
 
-	if opts.targetFilter != "" {
-		params = append(params, fmt.Sprintf("tq=%v", opts.targetFilter))
+	if opts.TargetFilter != "" {
+		params = append(params, fmt.Sprintf("tq=%v", opts.TargetFilter))
 	}
 
-	if opts.limit != 0 {
-		params = append(params, fmt.Sprintf("limit=%v", opts.limit))
+	if opts.Limit != 0 {
+		params = append(params, fmt.Sprintf("limit=%v", opts.Limit))
 	}
 
 	if len(params) != 0 {
