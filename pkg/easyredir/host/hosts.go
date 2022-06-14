@@ -43,16 +43,6 @@ func ListHostsPaginator(cl ClientAPI, opts ...func(*option.Options)) (h Hosts, e
 	return h, nil
 }
 
-func (h *Hosts) NextPage() func(o *option.Options) {
-	return func(o *option.Options) {
-		o.Pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
-	}
-}
-
-func (h *Hosts) HasMore() bool {
-	return h.Metadata.HasMore
-}
-
 func ListHosts(cl ClientAPI, opts ...func(*option.Options)) (h Hosts, err error) {
 	options := &option.Options{}
 	for _, o := range opts {
@@ -70,6 +60,34 @@ func ListHosts(cl ClientAPI, opts ...func(*option.Options)) (h Hosts, err error)
 	}
 
 	return h, nil
+}
+
+func GetHost(cl ClientAPI, id string) (h Host, err error) {
+	pathQuery := buildGetHost(id)
+	reader, err := cl.SendRequest(pathQuery, http.MethodGet, nil)
+	if err != nil {
+		return h, fmt.Errorf("unable to send request: %w", err)
+	}
+
+	if err := jsonutil.DecodeJSON(reader, &h); err != nil {
+		return h, fmt.Errorf("unable to get json: %w", err)
+	}
+
+	if ok := (h.Data.ID == id); !ok {
+		return h, fmt.Errorf("received incorrect host: %v", h.Data.ID)
+	}
+
+	return h, nil
+}
+
+func (h *Hosts) NextPage() func(o *option.Options) {
+	return func(o *option.Options) {
+		o.Pagination.StartingAfter = strings.Split(h.Links.Next, "=")[1]
+	}
+}
+
+func (h *Hosts) HasMore() bool {
+	return h.Metadata.HasMore
 }
 
 func buildListHosts(opts *option.Options) string {
@@ -95,24 +113,6 @@ func buildListHosts(opts *option.Options) string {
 	}
 
 	return sb.String()
-}
-
-func GetHost(cl ClientAPI, id string) (h Host, err error) {
-	pathQuery := buildGetHost(id)
-	reader, err := cl.SendRequest(pathQuery, http.MethodGet, nil)
-	if err != nil {
-		return h, fmt.Errorf("unable to send request: %w", err)
-	}
-
-	if err := jsonutil.DecodeJSON(reader, &h); err != nil {
-		return h, fmt.Errorf("unable to get json: %w", err)
-	}
-
-	if ok := (h.Data.ID == id); !ok {
-		return h, fmt.Errorf("received incorrect host: %v", h.Data.ID)
-	}
-
-	return h, nil
 }
 
 func buildGetHost(id string) string {
