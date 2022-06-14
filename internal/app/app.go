@@ -5,15 +5,10 @@ import (
 	"os"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
 func Run() error {
-	e := easyredir.New(&easyredir.Config{
-		APIKey:    os.Getenv("EASYREDIR_API_KEY"),
-		APISecret: os.Getenv("EASYREDIR_API_SECRET"),
-	})
+	e := easyredir.New(os.Getenv("EASYREDIR_API_KEY"), os.Getenv("EASYREDIR_API_SECRET"))
 
 	if len(os.Args) <= 1 {
 		return nil
@@ -41,7 +36,7 @@ func Run() error {
 }
 
 func listRules(e *easyredir.Easyredir) error {
-	r, err := rule.ListRules(e, easyredir.WithLimit(100))
+	r, err := e.ListRules()
 	if err != nil {
 		return fmt.Errorf("unable to list rules: %w", err)
 	}
@@ -52,7 +47,7 @@ func listRules(e *easyredir.Easyredir) error {
 }
 
 func listHosts(e *easyredir.Easyredir) error {
-	h, err := host.ListHostsPaginator(e, easyredir.WithLimit(100))
+	h, err := e.ListHosts()
 	if err != nil {
 		return fmt.Errorf("unable to list hosts: %w", err)
 	}
@@ -63,7 +58,7 @@ func listHosts(e *easyredir.Easyredir) error {
 }
 
 func getHost(e *easyredir.Easyredir) error {
-	h, err := host.GetHost(e, os.Args[2])
+	h, err := e.GetHost(os.Args[2])
 	if err != nil {
 		return fmt.Errorf("unable to get host: %v: %w", os.Args[2], err)
 	}

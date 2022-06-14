@@ -7,10 +7,18 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 )
 
-func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (r Rules, err error) {
+type ClientAPI interface {
+	SendRequest(baseURL, path, method string, body io.Reader) (io.ReadCloser, error)
+}
+
+type ConfigAPI interface {
+	BaseURL() string
+}
+
+func ListRulesPaginator(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},
 	}
@@ -22,7 +30,7 @@ func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)
 			optsWithPage = append(optsWithPage, rules.NextPage())
 		}
 
-		rules, err = ListRules(e, optsWithPage...)
+		rules, err = ListRules(cl, cfg, optsWithPage...)
 		if err != nil {
 			return r, fmt.Errorf("unable to get a rules page: %w", err)
 		}
@@ -35,14 +43,14 @@ func ListRulesPaginator(e *easyredir.Easyredir, opts ...func(*easyredir.Options)
 	return r, nil
 }
 
-func ListRules(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (r Rules, err error) {
-	options := &easyredir.Options{}
+func ListRules(cl ClientAPI, cfg ConfigAPI, opts ...func(*option.Options)) (r Rules, err error) {
+	options := &option.Options{}
 	for _, o := range opts {
 		o(options)
 	}
 
 	pathQuery := buildListRules(options)
-	reader, err := e.Client.SendRequest(e.Config.BaseURL, pathQuery, http.MethodGet, nil)
+	reader, err := cl.SendRequest(cfg.BaseURL(), pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return r, fmt.Errorf("unable to send request: %w", err)
 	}
@@ -54,8 +62,8 @@ func ListRules(e *easyredir.Easyredir, opts ...func(*easyredir.Options)) (r Rule
 	return r, nil
 }
 
-func (r *Rules) NextPage() func(o *easyredir.Options) {
-	return func(o *easyredir.Options) {
+func (r *Rules) NextPage() func(o *option.Options) {
+	return func(o *option.Options) {
 		o.Pagination.StartingAfter = strings.Split(r.Links.Next, "=")[1]
 	}
 }
@@ -64,7 +72,7 @@ func (r *Rules) HasMore() bool {
 	return r.Metadata.HasMore
 }
 
-func buildListRules(opts *easyredir.Options) string {
+func buildListRules(opts *option.Options) string {
 	var sb strings.Builder
 	var params []string
 

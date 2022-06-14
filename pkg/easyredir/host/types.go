@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
 type Hosts struct {
 	Data     []Data             `json:"data"`
-	Metadata easyredir.Metadata `json:"meta"`
-	Links    easyredir.Links    `json:"links"`
+	Metadata pagination.Metadata `json:"meta"`
+	Links    pagination.Links    `json:"links"`
 }
 
 type Data struct {

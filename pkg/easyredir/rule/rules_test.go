@@ -7,7 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/config"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
 
 	"github.com/gotidy/ptr"
 	"github.com/maxatome/go-testdeep/td"
@@ -26,7 +28,7 @@ func (m *mockClient) SendRequest(baseURL, path, method string, body io.Reader) (
 
 func TestListRules(t *testing.T) {
 	type Args struct {
-		options []func(*easyredir.Options)
+		options []func(*option.Options)
 	}
 
 	type Fields struct {
@@ -93,10 +95,10 @@ func TestListRules(t *testing.T) {
 							},
 						},
 					},
-					Metadata: easyredir.Metadata{
+					Metadata: pagination.Metadata{
 						HasMore: true,
 					},
-					Links: easyredir.Links{
+					Links: pagination.Links{
 						Next: "/v1/rules?starting_after=abc-def",
 						Prev: "/v1/rules?ending_before=abc-def",
 					},
@@ -105,8 +107,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_source_filter",
 			args: Args{
-				options: []func(*easyredir.Options){
-					easyredir.WithSourceFilter("https://www1.example.org"),
+				options: []func(*option.Options){
+					option.WithSourceFilter("https://www1.example.org"),
 				},
 			},
 			fields: Fields{
@@ -134,8 +136,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_target_filter",
 			args: Args{
-				options: []func(*easyredir.Options){
-					easyredir.WithTargetFilter("https://www2.example.org"),
+				options: []func(*option.Options){
+					option.WithTargetFilter("https://www2.example.org"),
 				},
 			},
 			fields: Fields{
@@ -163,9 +165,9 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_both_source_target_filter",
 			args: Args{
-				options: []func(*easyredir.Options){
-					easyredir.WithSourceFilter("https://www1.example.org"),
-					easyredir.WithTargetFilter("https://www2.example.org"),
+				options: []func(*option.Options){
+					option.WithSourceFilter("https://www1.example.org"),
+					option.WithTargetFilter("https://www2.example.org"),
 				},
 			},
 			fields: Fields{
@@ -193,8 +195,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_limit",
 			args: Args{
-				options: []func(*easyredir.Options){
-					easyredir.WithLimit(1),
+				options: []func(*option.Options){
+					option.WithLimit(1),
 				},
 			},
 			fields: Fields{
@@ -235,14 +237,12 @@ func TestListRules(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &easyredir.Easyredir{
-				Client: &mockClient{
-					data: tt.fields.data,
-				},
-				Config: &easyredir.Config{},
+			cl := &mockClient{
+				data: tt.fields.data,
 			}
+			cfg := config.New("", "")
 
-			got, err := ListRules(e, tt.args.options...)
+			got, err := ListRules(cl, cfg, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -256,7 +256,7 @@ func TestListRules(t *testing.T) {
 
 func TestBuildListRules(t *testing.T) {
 	type Args struct {
-		options *easyredir.Options
+		options *option.Options
 	}
 
 	type Want struct {
@@ -271,7 +271,7 @@ func TestBuildListRules(t *testing.T) {
 		{
 			name: "no_options",
 			args: Args{
-				options: &easyredir.Options{},
+				options: &option.Options{},
 			},
 			want: Want{
 				pathQuery: "/rules",
@@ -279,8 +279,8 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "starting_after",
 			args: Args{
-				options: &easyredir.Options{
-					Pagination: easyredir.Pagination{
+				options: &option.Options{
+					Pagination: pagination.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -291,8 +291,8 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "ending_before",
 			args: Args{
-				options: &easyredir.Options{
-					Pagination: easyredir.Pagination{
+				options: &option.Options{
+					Pagination: pagination.Pagination{
 						EndingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
 				},
@@ -303,7 +303,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "source_filter",
 			args: Args{
-				options: &easyredir.Options{
+				options: &option.Options{
 					SourceFilter: "http://www1.example.org",
 				},
 			},
@@ -313,7 +313,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "target_filter",
 			args: Args{
-				options: &easyredir.Options{
+				options: &option.Options{
 					TargetFilter: "http://www2.example.org",
 				},
 			},
@@ -323,7 +323,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "source_target_filter",
 			args: Args{
-				options: &easyredir.Options{
+				options: &option.Options{
 					SourceFilter: "http://www1.example.org",
 					TargetFilter: "http://www2.example.org",
 				},
@@ -334,7 +334,7 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "limit",
 			args: Args{
-				options: &easyredir.Options{
+				options: &option.Options{
 					Limit: 100,
 				},
 			},
@@ -344,11 +344,11 @@ func TestBuildListRules(t *testing.T) {
 		}, {
 			name: "all",
 			args: Args{
-				options: &easyredir.Options{
+				options: &option.Options{
 					SourceFilter: "http://www1.example.org",
 					TargetFilter: "http://www2.example.org",
 					Limit:        100,
-					Pagination: easyredir.Pagination{
+					Pagination: pagination.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -406,7 +406,7 @@ func (m *mockPaginatorClient) SendRequest(baseURL, path, method string, body io.
 
 func TestListRulesPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*easyredir.Options)
+		options []func(*option.Options)
 	}
 
 	type Fields struct {
@@ -446,7 +446,7 @@ func TestListRulesPaginator(t *testing.T) {
 							Type: "rule",
 						},
 					},
-					Metadata: easyredir.Metadata{
+					Metadata: pagination.Metadata{
 						HasMore: false,
 					},
 				},
@@ -539,14 +539,12 @@ func TestListRulesPaginator(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := &easyredir.Easyredir{
-				Client: &mockPaginatorClient{
-					data: tt.fields.data,
-				},
-				Config: &easyredir.Config{},
+			cl := &mockPaginatorClient{
+				data: tt.fields.data,
 			}
+			cfg := config.New("", "")
 
-			got, err := ListRulesPaginator(e, tt.args.options...)
+			got, err := ListRulesPaginator(cl, cfg, tt.args.options...)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
