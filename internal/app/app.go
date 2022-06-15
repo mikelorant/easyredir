@@ -9,8 +9,8 @@ import (
 
 func Run() error {
 	e := easyredir.New(
-		os.Getenv("EASYREDIR_API_KEY"),
-		os.Getenv("EASYREDIR_API_SECRET"),
+		easyredir.WithAPIKey(os.Getenv("EASYREDIR_API_KEY")),
+		easyredir.WithAPISecret(os.Getenv("EASYREDIR_API_SECRET")),
 	)
 
 	if len(os.Args) <= 1 {

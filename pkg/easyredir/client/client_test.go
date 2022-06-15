@@ -12,6 +12,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type WithBaseURL string
+
+func (u WithBaseURL) Apply(o *option.Options) {
+	o.BaseURL = string(u)
+}
+
 func TestSendRequest(t *testing.T) {
 	type Fields struct {
 		method     string
@@ -113,7 +119,7 @@ func TestSendRequest(t *testing.T) {
 			}))
 			defer server.Close()
 
-			cl := New(option.WithBaseURL(server.URL))
+			cl := New(WithBaseURL(server.URL))
 
 			r, err := cl.SendRequest(path, method, body)
 			if tt.want.err != "" {

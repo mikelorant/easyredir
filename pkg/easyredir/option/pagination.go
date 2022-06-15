@@ -1,4 +1,4 @@
-package pagination
+package option
 
 type Metadata struct {
 	HasMore bool `json:"has_more,omitempty"`

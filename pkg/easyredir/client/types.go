@@ -1,6 +1,14 @@
 package client
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+)
+
+type Option interface {
+	Apply(*option.Options)
+}
 
 type APIErrors struct {
 	Type    string     `json:"type"`

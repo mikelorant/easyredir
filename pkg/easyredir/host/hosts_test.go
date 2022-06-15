@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
 
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/assert"
@@ -24,9 +23,15 @@ func (m *mockClient) SendRequest(path, method string, body io.Reader) (io.ReadCl
 	return rc, nil
 }
 
+type WithLimit int
+
+func (l WithLimit) Apply(o *option.Options) {
+	o.Limit = int(l)
+}
+
 func TestListHosts(t *testing.T) {
 	type Args struct {
-		options []func(*option.Options)
+		options []Option
 	}
 	type Fields struct {
 		data string
@@ -87,10 +92,10 @@ func TestListHosts(t *testing.T) {
 							},
 						},
 					},
-					Metadata: pagination.Metadata{
+					Metadata: option.Metadata{
 						HasMore: true,
 					},
-					Links: pagination.Links{
+					Links: option.Links{
 						Next: "/v1/rules?starting_after=abc-def",
 						Prev: "/v1/rules?ending_before=abc-def",
 					},
@@ -125,8 +130,8 @@ func TestListHosts(t *testing.T) {
 		{
 			name: "with_limit",
 			args: Args{
-				options: []func(*option.Options){
-					option.WithLimit(1),
+				options: []Option{
+					WithLimit(1),
 				},
 			},
 			fields: Fields{
@@ -198,7 +203,7 @@ func TestBuildListHosts(t *testing.T) {
 			name: "starting_after",
 			args: Args{
 				options: &option.Options{
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -210,7 +215,7 @@ func TestBuildListHosts(t *testing.T) {
 			name: "ending_before",
 			args: Args{
 				options: &option.Options{
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						EndingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
 				},
@@ -233,7 +238,7 @@ func TestBuildListHosts(t *testing.T) {
 			args: Args{
 				options: &option.Options{
 					Limit: 100,
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -291,7 +296,7 @@ func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (
 
 func TestListHostsPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*option.Options)
+		options []Option
 	}
 
 	type Fields struct {
@@ -331,7 +336,7 @@ func TestListHostsPaginator(t *testing.T) {
 							Type: "rule",
 						},
 					},
-					Metadata: pagination.Metadata{
+					Metadata: option.Metadata{
 						HasMore: false,
 					},
 				},

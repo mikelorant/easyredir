@@ -33,15 +33,16 @@ const (
 	ResourceType = "application/json; charset=utf-8"
 )
 
-func New(opts ...func(*option.Options)) *Client {
-	options := &option.Options{}
-	for _, o := range opts {
-		o(options)
+func New(opts ...Option) *Client {
+	o := &option.Options{}
+
+	for _, opt := range opts {
+		opt.Apply(o)
 	}
 
 	return &Client{
-		HTTPClient: buildHTTPClient(options),
-		Config:     buildConfig(options),
+		HTTPClient: buildHTTPClient(o),
+		Config:     buildConfig(o),
 	}
 }
 

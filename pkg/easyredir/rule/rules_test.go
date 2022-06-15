@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
 
 	"github.com/gotidy/ptr"
 	"github.com/maxatome/go-testdeep/td"
@@ -25,9 +24,27 @@ func (m *mockClient) SendRequest(path, method string, body io.Reader) (io.ReadCl
 	return rc, nil
 }
 
+type WithLimit int
+
+func (l WithLimit) Apply(o *option.Options) {
+	o.Limit = int(l)
+}
+
+type WithSourceFilter string
+
+func (s WithSourceFilter) Apply(o *option.Options) {
+	o.SourceFilter = string(s)
+}
+
+type WithTargetFilter string
+
+func (t WithTargetFilter) Apply(o *option.Options) {
+	o.TargetFilter = string(t)
+}
+
 func TestListRules(t *testing.T) {
 	type Args struct {
-		options []func(*option.Options)
+		options []Option
 	}
 
 	type Fields struct {
@@ -94,10 +111,10 @@ func TestListRules(t *testing.T) {
 							},
 						},
 					},
-					Metadata: pagination.Metadata{
+					Metadata: option.Metadata{
 						HasMore: true,
 					},
-					Links: pagination.Links{
+					Links: option.Links{
 						Next: "/v1/rules?starting_after=abc-def",
 						Prev: "/v1/rules?ending_before=abc-def",
 					},
@@ -106,8 +123,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_source_filter",
 			args: Args{
-				options: []func(*option.Options){
-					option.WithSourceFilter("https://www1.example.org"),
+				options: []Option{
+					WithSourceFilter("https://www1.example.org"),
 				},
 			},
 			fields: Fields{
@@ -135,8 +152,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_target_filter",
 			args: Args{
-				options: []func(*option.Options){
-					option.WithTargetFilter("https://www2.example.org"),
+				options: []Option{
+					WithTargetFilter("https://www2.example.org"),
 				},
 			},
 			fields: Fields{
@@ -164,9 +181,9 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_both_source_target_filter",
 			args: Args{
-				options: []func(*option.Options){
-					option.WithSourceFilter("https://www1.example.org"),
-					option.WithTargetFilter("https://www2.example.org"),
+				options: []Option{
+					WithSourceFilter("https://www1.example.org"),
+					WithTargetFilter("https://www2.example.org"),
 				},
 			},
 			fields: Fields{
@@ -194,8 +211,8 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_limit",
 			args: Args{
-				options: []func(*option.Options){
-					option.WithLimit(1),
+				options: []Option{
+					WithLimit(1),
 				},
 			},
 			fields: Fields{
@@ -278,7 +295,7 @@ func TestBuildListRules(t *testing.T) {
 			name: "starting_after",
 			args: Args{
 				options: &option.Options{
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -290,7 +307,7 @@ func TestBuildListRules(t *testing.T) {
 			name: "ending_before",
 			args: Args{
 				options: &option.Options{
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						EndingBefore: "c6312a3c5514-94ea-81c4-1336-8ec03b69",
 					},
 				},
@@ -346,7 +363,7 @@ func TestBuildListRules(t *testing.T) {
 					SourceFilter: "http://www1.example.org",
 					TargetFilter: "http://www2.example.org",
 					Limit:        100,
-					Pagination: pagination.Pagination{
+					Pagination: option.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
@@ -404,7 +421,7 @@ func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (
 
 func TestListRulesPaginator(t *testing.T) {
 	type Args struct {
-		options []func(*option.Options)
+		options []Option
 	}
 
 	type Fields struct {
@@ -444,7 +461,7 @@ func TestListRulesPaginator(t *testing.T) {
 							Type: "rule",
 						},
 					},
-					Metadata: pagination.Metadata{
+					Metadata: option.Metadata{
 						HasMore: false,
 					},
 				},

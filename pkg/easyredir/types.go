@@ -1,6 +1,19 @@
 package easyredir
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+)
+
+type Option interface {
+	Apply(*option.Options)
+}
+
+type Doer interface {
+	Do(*http.Request) (*http.Response, error)
+}
 
 type APIErrors struct {
 	Type    string     `json:"type"`

@@ -2,16 +2,25 @@ package host
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/pagination"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
 
+type ClientAPI interface {
+	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
+}
+
+type Option interface {
+	Apply(*option.Options)
+}
+
 type Hosts struct {
-	Data     []Data              `json:"data"`
-	Metadata pagination.Metadata `json:"meta"`
-	Links    pagination.Links    `json:"links"`
+	Data     []Data          `json:"data"`
+	Metadata option.Metadata `json:"meta"`
+	Links    option.Links    `json:"links"`
 }
 
 type Data struct {

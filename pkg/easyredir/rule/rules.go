@@ -2,7 +2,6 @@ package rule
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 
@@ -10,11 +9,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
-type ClientAPI interface {
-	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
-}
-
-func ListRulesPaginator(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error) {
+func ListRulesPaginator(cl ClientAPI, opts ...Option) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},
 	}
@@ -39,13 +34,13 @@ func ListRulesPaginator(cl ClientAPI, opts ...func(*option.Options)) (r Rules, e
 	return r, nil
 }
 
-func ListRules(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error) {
-	options := &option.Options{}
-	for _, o := range opts {
-		o(options)
+func ListRules(cl ClientAPI, opts ...Option) (r Rules, err error) {
+	o := &option.Options{}
+	for _, opt := range opts {
+		opt.Apply(o)
 	}
 
-	pathQuery := buildListRules(options)
+	pathQuery := buildListRules(o)
 	reader, err := cl.SendRequest(pathQuery, http.MethodGet, nil)
 	if err != nil {
 		return r, fmt.Errorf("unable to send request: %w", err)
@@ -58,10 +53,14 @@ func ListRules(cl ClientAPI, opts ...func(*option.Options)) (r Rules, err error)
 	return r, nil
 }
 
-func (r *Rules) NextPage() func(o *option.Options) {
-	return func(o *option.Options) {
-		o.Pagination.StartingAfter = strings.Split(r.Links.Next, "=")[1]
-	}
+func (r *Rules) NextPage() NextPage {
+	return NextPage(strings.Split((r.Links.Next), "=")[1])
+}
+
+type NextPage string
+
+func (np NextPage) Apply(o *option.Options) {
+	o.Pagination.StartingAfter = string(np)
 }
 
 func (r *Rules) HasMore() bool {
