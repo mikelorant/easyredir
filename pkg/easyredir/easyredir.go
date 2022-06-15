@@ -11,17 +11,8 @@ type Easyredir struct {
 }
 
 func New(opts ...option.Option) *Easyredir {
-	o := &option.Options{}
-
-	for _, opt := range opts {
-		opt.Apply(o)
-	}
-
 	return &Easyredir{
-		Client: NewClient(
-			WithAPIKey(o.APIKey),
-			WithAPISecret(o.APISecret),
-		),
+		Client: NewClient(opts...),
 	}
 }
 
