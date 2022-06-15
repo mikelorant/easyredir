@@ -19,54 +19,36 @@ func Run() error {
 
 	switch os.Args[1] {
 	case "rules":
-		if err := listRules(e); err != nil {
+		r, err := e.ListRules(easyredir.WithLimit(100))
+		if err != nil {
 			return fmt.Errorf("unable to list rules: %w", err)
 		}
+
+		fmt.Print(r)
+
+		return nil
+
 	case "hosts":
 		if len(os.Args) > 2 {
-			if err := getHost(e); err != nil {
-				return fmt.Errorf("unable to list hosts: %w", err)
+			h, err := e.GetHost(os.Args[2])
+			if err != nil {
+				return fmt.Errorf("unable to get host: %v: %w", os.Args[2], err)
 			}
+
+			fmt.Print(h)
+
 			return nil
 		}
 
-		if err := listHosts(e); err != nil {
+		h, err := e.ListHosts(easyredir.WithLimit(100))
+		if err != nil {
 			return fmt.Errorf("unable to list hosts: %w", err)
 		}
+
+		fmt.Print(h)
+
+		return nil
 	}
-
-	return nil
-}
-
-func listRules(e *easyredir.Easyredir) error {
-	r, err := e.ListRules(easyredir.WithLimit(100))
-	if err != nil {
-		return fmt.Errorf("unable to list rules: %w", err)
-	}
-
-	fmt.Print(r)
-
-	return nil
-}
-
-func listHosts(e *easyredir.Easyredir) error {
-	h, err := e.ListHosts(easyredir.WithLimit(100))
-	if err != nil {
-		return fmt.Errorf("unable to list hosts: %w", err)
-	}
-
-	fmt.Print(h)
-
-	return nil
-}
-
-func getHost(e *easyredir.Easyredir) error {
-	h, err := e.GetHost(os.Args[2])
-	if err != nil {
-		return fmt.Errorf("unable to get host: %v: %w", os.Args[2], err)
-	}
-
-	fmt.Print(h)
 
 	return nil
 }
