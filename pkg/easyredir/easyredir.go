@@ -1,17 +1,16 @@
 package easyredir
 
 import (
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
 type Easyredir struct {
-	Client *client.Client
+	Client *Client
 }
 
-func New(opts ...Option) *Easyredir {
+func New(opts ...option.Option) *Easyredir {
 	o := &option.Options{}
 
 	for _, opt := range opts {
@@ -19,19 +18,19 @@ func New(opts ...Option) *Easyredir {
 	}
 
 	return &Easyredir{
-		Client: client.New(
+		Client: NewClient(
 			WithAPIKey(o.APIKey),
 			WithAPISecret(o.APISecret),
 		),
 	}
 }
 
-func (c *Easyredir) ListRules() (r rule.Rules, err error) {
-	return rule.ListRulesPaginator(c.Client, WithLimit(100))
+func (c *Easyredir) ListRules(opts ...option.Option) (r rule.Rules, err error) {
+	return rule.ListRulesPaginator(c.Client, opts...)
 }
 
-func (c *Easyredir) ListHosts() (h host.Hosts, err error) {
-	return host.ListHostsPaginator(c.Client, WithLimit(100))
+func (c *Easyredir) ListHosts(opts ...option.Option) (h host.Hosts, err error) {
+	return host.ListHostsPaginator(c.Client, opts...)
 }
 
 func (c *Easyredir) GetHost(id string) (h host.Host, err error) {

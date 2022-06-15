@@ -9,7 +9,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
-func ListHostsPaginator(cl ClientAPI, opts ...Option) (h Hosts, err error) {
+func ListHostsPaginator(cl ClientAPI, opts ...option.Option) (h Hosts, err error) {
 	h = Hosts{
 		Data: []Data{},
 	}
@@ -34,7 +34,7 @@ func ListHostsPaginator(cl ClientAPI, opts ...Option) (h Hosts, err error) {
 	return h, nil
 }
 
-func ListHosts(cl ClientAPI, opts ...Option) (h Hosts, err error) {
+func ListHosts(cl ClientAPI, opts ...option.Option) (h Hosts, err error) {
 	o := &option.Options{}
 	for _, opt := range opts {
 		opt.Apply(o)

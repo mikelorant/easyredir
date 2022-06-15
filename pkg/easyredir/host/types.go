@@ -13,10 +13,6 @@ type ClientAPI interface {
 	SendRequest(path, method string, body io.Reader) (io.ReadCloser, error)
 }
 
-type Option interface {
-	Apply(*option.Options)
-}
-
 type Hosts struct {
 	Data     []Data          `json:"data"`
 	Metadata option.Metadata `json:"meta"`

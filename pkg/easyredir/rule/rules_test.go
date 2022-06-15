@@ -44,7 +44,7 @@ func (t WithTargetFilter) Apply(o *option.Options) {
 
 func TestListRules(t *testing.T) {
 	type Args struct {
-		options []Option
+		options []option.Option
 	}
 
 	type Fields struct {
@@ -123,7 +123,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_source_filter",
 			args: Args{
-				options: []Option{
+				options: []option.Option{
 					WithSourceFilter("https://www1.example.org"),
 				},
 			},
@@ -152,7 +152,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_target_filter",
 			args: Args{
-				options: []Option{
+				options: []option.Option{
 					WithTargetFilter("https://www2.example.org"),
 				},
 			},
@@ -181,7 +181,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_both_source_target_filter",
 			args: Args{
-				options: []Option{
+				options: []option.Option{
 					WithSourceFilter("https://www1.example.org"),
 					WithTargetFilter("https://www2.example.org"),
 				},
@@ -211,7 +211,7 @@ func TestListRules(t *testing.T) {
 		}, {
 			name: "with_limit",
 			args: Args{
-				options: []Option{
+				options: []option.Option{
 					WithLimit(1),
 				},
 			},
@@ -421,7 +421,7 @@ func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (
 
 func TestListRulesPaginator(t *testing.T) {
 	type Args struct {
-		options []Option
+		options []option.Option
 	}
 
 	type Fields struct {

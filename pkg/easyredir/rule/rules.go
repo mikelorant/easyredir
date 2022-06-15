@@ -9,7 +9,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
-func ListRulesPaginator(cl ClientAPI, opts ...Option) (r Rules, err error) {
+func ListRulesPaginator(cl ClientAPI, opts ...option.Option) (r Rules, err error) {
 	r = Rules{
 		Data: []Data{},
 	}
@@ -34,7 +34,7 @@ func ListRulesPaginator(cl ClientAPI, opts ...Option) (r Rules, err error) {
 	return r, nil
 }
 
-func ListRules(cl ClientAPI, opts ...Option) (r Rules, err error) {
+func ListRules(cl ClientAPI, opts ...option.Option) (r Rules, err error) {
 	o := &option.Options{}
 	for _, opt := range opts {
 		opt.Apply(o)

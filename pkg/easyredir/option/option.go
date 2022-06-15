@@ -4,6 +4,10 @@ import (
 	"net/http"
 )
 
+type Option interface {
+	Apply(*Options)
+}
+
 type Doer interface {
 	Do(*http.Request) (*http.Response, error)
 }

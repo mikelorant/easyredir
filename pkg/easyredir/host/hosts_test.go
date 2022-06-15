@@ -31,7 +31,7 @@ func (l WithLimit) Apply(o *option.Options) {
 
 func TestListHosts(t *testing.T) {
 	type Args struct {
-		options []Option
+		options []option.Option
 	}
 	type Fields struct {
 		data string
@@ -130,7 +130,7 @@ func TestListHosts(t *testing.T) {
 		{
 			name: "with_limit",
 			args: Args{
-				options: []Option{
+				options: []option.Option{
 					WithLimit(1),
 				},
 			},
@@ -296,7 +296,7 @@ func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (
 
 func TestListHostsPaginator(t *testing.T) {
 	type Args struct {
-		options []Option
+		options []option.Option
 	}
 
 	type Fields struct {

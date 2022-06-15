@@ -3,16 +3,21 @@ package easyredir
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 )
-
-type Option interface {
-	Apply(*option.Options)
-}
 
 type Doer interface {
 	Do(*http.Request) (*http.Response, error)
+}
+
+type Client struct {
+	HTTPClient Doer
+	Config     *Config
+}
+
+type Config struct {
+	BaseURL   string
+	APIKey    string
+	APISecret string
 }
 
 type APIErrors struct {
@@ -33,6 +38,14 @@ type RateLimitError struct {
 	Remaining string
 	Reset     string
 }
+
+const (
+	BaseURL = "https://api.easyredir.com/v1"
+)
+
+const (
+	ResourceType = "application/json; charset=utf-8"
+)
 
 func (err APIErrors) Error() string {
 	str := err.Type

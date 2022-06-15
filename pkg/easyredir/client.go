@@ -1,4 +1,4 @@
-package client
+package easyredir
 
 import (
 	"fmt"
@@ -10,30 +10,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
-type Doer interface {
-	Do(*http.Request) (*http.Response, error)
-}
-
-type Client struct {
-	HTTPClient Doer
-	Config     *Config
-}
-
-type Config struct {
-	BaseURL   string
-	APIKey    string
-	APISecret string
-}
-
-const (
-	BaseURL = "https://api.easyredir.com/v1"
-)
-
-const (
-	ResourceType = "application/json; charset=utf-8"
-)
-
-func New(opts ...Option) *Client {
+func NewClient(opts ...option.Option) *Client {
 	o := &option.Options{}
 
 	for _, opt := range opts {

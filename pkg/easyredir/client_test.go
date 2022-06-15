@@ -1,4 +1,4 @@
-package client
+package easyredir
 
 import (
 	"io"
@@ -8,15 +8,8 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/stretchr/testify/assert"
 )
-
-type WithBaseURL string
-
-func (u WithBaseURL) Apply(o *option.Options) {
-	o.BaseURL = string(u)
-}
 
 func TestSendRequest(t *testing.T) {
 	type Fields struct {
@@ -119,7 +112,7 @@ func TestSendRequest(t *testing.T) {
 			}))
 			defer server.Close()
 
-			cl := New(WithBaseURL(server.URL))
+			cl := NewClient(WithBaseURL(server.URL))
 
 			r, err := cl.SendRequest(path, method, body)
 			if tt.want.err != "" {
