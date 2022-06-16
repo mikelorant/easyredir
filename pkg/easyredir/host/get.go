@@ -18,10 +18,6 @@ func GetHost(cl ClientAPI, id string) (h Host, err error) {
 		return h, fmt.Errorf("unable to get json: %w", err)
 	}
 
-	if ok := (h.Data.ID == id); !ok {
-		return h, fmt.Errorf("received incorrect host: %v", h.Data.ID)
-	}
-
 	return h, nil
 }
 
