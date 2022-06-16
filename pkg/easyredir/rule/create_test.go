@@ -20,9 +20,8 @@ func TestCreateRule(t *testing.T) {
 		body   string
 	}
 	type Want struct {
-		status int
-		rule   Rule
-		err    string
+		rule Rule
+		err  string
 	}
 
 	tests := []struct {
