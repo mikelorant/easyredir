@@ -1,4 +1,4 @@
-package rule
+package host
 
 import (
 	"net/http"
@@ -8,24 +8,16 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 
-	"github.com/gotidy/ptr"
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/assert"
 )
 
-type WithBaseURL string
-
-func (u WithBaseURL) Apply(o *option.Options) {
-	o.BaseURL = string(u)
-}
-
-func TestListRules(t *testing.T) {
+func TestListHosts(t *testing.T) {
 	type Fields struct {
 		data string
 	}
-
 	type Want struct {
-		rules Rules
+		hosts Hosts
 		err   string
 	}
 
@@ -42,16 +34,14 @@ func TestListRules(t *testing.T) {
 					  "data": [
 					    {
 					      "id": "abc-def",
-					      "type": "rule",
+					      "type": "host",
 					      "attributes": {
-					        "forward_params": true,
-					        "forward_path": true,
-					        "response_type": "moved_permanently",
-					        "source_urls": [
-					          "abc.com",
-					          "abc.com/123"
-					        ],
-					        "target_url": "otherdomain.com"
+					        "name": "easyredir.com",
+					        "dns_status": "active",
+					        "certificate_status": "active"
+					      },
+					      "links": {
+					        "self": "/v1/hosts/abc-def"
 					      }
 					    }
 					  ],
@@ -66,20 +56,18 @@ func TestListRules(t *testing.T) {
 				`,
 			},
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{
 						{
 							ID:   "abc-def",
-							Type: "rule",
+							Type: "host",
 							Attributes: Attributes{
-								ForwardParams: ptr.Bool(true),
-								ForwardPath:   ptr.Bool(true),
-								ResponseType:  ptr.String("moved_permanently"),
-								SourceURLs: []string{
-									"abc.com",
-									"abc.com/123",
-								},
-								TargetURL: ptr.String("otherdomain.com"),
+								Name:              "easyredir.com",
+								DNSStatus:         "active",
+								CertificateStatus: "active",
+							},
+							Links: Links{
+								Self: "/v1/hosts/abc-def",
 							},
 						},
 					},
@@ -98,7 +86,7 @@ func TestListRules(t *testing.T) {
 				data: "notjson",
 			},
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{},
 				},
 				err: "unable to get json",
@@ -109,7 +97,7 @@ func TestListRules(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/rules/", func(w http.ResponseWriter, req *http.Request) {
+			mux.HandleFunc("/hosts/", func(w http.ResponseWriter, req *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(tt.fields.data))
 			})
@@ -118,19 +106,19 @@ func TestListRules(t *testing.T) {
 
 			cl := client.New(WithBaseURL(server.URL))
 
-			got, err := ListRules(cl)
+			got, err := ListHosts(cl)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
 				return
 			}
 			assert.Nil(t, err)
-			td.Cmp(t, got, tt.want.rules)
+			td.Cmp(t, got, tt.want.hosts)
 		})
 	}
 }
 
-func TestListRulesPaginator(t *testing.T) {
+func TestListHostsPaginator(t *testing.T) {
 	type MockData struct {
 		status int
 		body   string
@@ -141,7 +129,7 @@ func TestListRulesPaginator(t *testing.T) {
 	}
 
 	type Want struct {
-		rules Rules
+		hosts Hosts
 		err   string
 	}
 
@@ -159,10 +147,10 @@ func TestListRulesPaginator(t *testing.T) {
 						body: `
 							{
 							  "data": [
-							    {
-							      "id": "abc-def",
-							      "type": "rule"
-							    }
+								{
+								  "id": "abc-def",
+								  "type": "rule"
+								}
 							  ]
 							}
 						`,
@@ -170,15 +158,12 @@ func TestListRulesPaginator(t *testing.T) {
 				},
 			},
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{
 						{
 							ID:   "abc-def",
 							Type: "rule",
 						},
-					},
-					Metadata: option.Metadata{
-						HasMore: false,
 					},
 				},
 			},
@@ -194,14 +179,14 @@ func TestListRulesPaginator(t *testing.T) {
 							  "data": [
 							    {
 							      "id": "abc-def",
-							      "type": "rule"
+							      "type": "host"
 							    }
 							  ],
 							  "meta": {
 								  "has_more": true
 							  },
 							  "links": {
-								  "next": "/v1/rules?starting_after=abc-def"
+								  "next": "/v1/hosts?starting_after=abc-def"
 							  }
 							}
 						`,
@@ -213,7 +198,7 @@ func TestListRulesPaginator(t *testing.T) {
 							  "data": [
 							    {
 							      "id": "bcd-efg",
-							      "type": "rule"
+							      "type": "host"
 							    }
 							  ]
 							}
@@ -222,14 +207,14 @@ func TestListRulesPaginator(t *testing.T) {
 				},
 			},
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{
 						{
 							ID:   "abc-def",
-							Type: "rule",
+							Type: "host",
 						}, {
 							ID:   "bcd-efg",
-							Type: "rule",
+							Type: "host",
 						},
 					},
 				},
@@ -238,7 +223,7 @@ func TestListRulesPaginator(t *testing.T) {
 		{
 			name: "none",
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{},
 				},
 			},
@@ -254,14 +239,14 @@ func TestListRulesPaginator(t *testing.T) {
 							  "data": [
 							    {
 							      "id": "abc-def",
-							      "type": "rule"
+							      "type": "host"
 							    }
 							  ],
 							  "meta": {
 								  "has_more": true
 							  },
 							  "links": {
-								  "next": "/v1/rules?starting_after=abc-def"
+								  "next": "/v1/hosts?starting_after=abc-def"
 							  }
 							}
 						`,
@@ -273,15 +258,15 @@ func TestListRulesPaginator(t *testing.T) {
 				},
 			},
 			want: Want{
-				rules: Rules{
+				hosts: Hosts{
 					Data: []Data{
 						{
 							ID:   "abc-def",
-							Type: "rule",
+							Type: "host",
 						},
 					},
 				},
-				err: "unable to get a rules page",
+				err: "unable to get a hosts page",
 			},
 		},
 	}
@@ -297,7 +282,7 @@ func TestListRulesPaginator(t *testing.T) {
 			}()
 
 			mux := http.NewServeMux()
-			mux.HandleFunc("/rules/", func(w http.ResponseWriter, req *http.Request) {
+			mux.HandleFunc("/hosts/", func(w http.ResponseWriter, req *http.Request) {
 				if len(tt.fields.data) < 1 {
 					w.WriteHeader(http.StatusOK)
 					w.Write([]byte("{}"))
@@ -313,19 +298,19 @@ func TestListRulesPaginator(t *testing.T) {
 
 			cl := client.New(WithBaseURL(server.URL))
 
-			got, err := ListRulesPaginator(cl)
+			got, err := ListHostsPaginator(cl)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
 				return
 			}
 			assert.Nil(t, err)
-			td.Cmp(t, got, tt.want.rules)
+			td.Cmp(t, got, tt.want.hosts)
 		})
 	}
 }
 
-func TestBuildListRules(t *testing.T) {
+func TestBuildListHosts(t *testing.T) {
 	type Args struct {
 		options *option.Options
 	}
@@ -345,7 +330,7 @@ func TestBuildListRules(t *testing.T) {
 				options: &option.Options{},
 			},
 			want: Want{
-				pathQuery: "/rules",
+				pathQuery: "/hosts",
 			},
 		}, {
 			name: "starting_after",
@@ -357,7 +342,7 @@ func TestBuildListRules(t *testing.T) {
 				},
 			},
 			want: Want{
-				pathQuery: "/rules?starting_after=96b30ce8-6331-4c18-ae49-4155c3a2136c",
+				pathQuery: "/hosts?starting_after=96b30ce8-6331-4c18-ae49-4155c3a2136c",
 			},
 		}, {
 			name: "ending_before",
@@ -369,38 +354,7 @@ func TestBuildListRules(t *testing.T) {
 				},
 			},
 			want: Want{
-				pathQuery: "/rules?ending_before=c6312a3c5514-94ea-81c4-1336-8ec03b69",
-			},
-		}, {
-			name: "source_filter",
-			args: Args{
-				options: &option.Options{
-					SourceFilter: "http://www1.example.org",
-				},
-			},
-			want: Want{
-				pathQuery: "/rules?sq=http://www1.example.org",
-			},
-		}, {
-			name: "target_filter",
-			args: Args{
-				options: &option.Options{
-					TargetFilter: "http://www2.example.org",
-				},
-			},
-			want: Want{
-				pathQuery: "/rules?tq=http://www2.example.org",
-			},
-		}, {
-			name: "source_target_filter",
-			args: Args{
-				options: &option.Options{
-					SourceFilter: "http://www1.example.org",
-					TargetFilter: "http://www2.example.org",
-				},
-			},
-			want: Want{
-				pathQuery: "/rules?sq=http://www1.example.org&tq=http://www2.example.org",
+				pathQuery: "/hosts?ending_before=c6312a3c5514-94ea-81c4-1336-8ec03b69",
 			},
 		}, {
 			name: "limit",
@@ -410,29 +364,27 @@ func TestBuildListRules(t *testing.T) {
 				},
 			},
 			want: Want{
-				pathQuery: "/rules?limit=100",
+				pathQuery: "/hosts?limit=100",
 			},
 		}, {
 			name: "all",
 			args: Args{
 				options: &option.Options{
-					SourceFilter: "http://www1.example.org",
-					TargetFilter: "http://www2.example.org",
-					Limit:        100,
+					Limit: 100,
 					Pagination: option.Pagination{
 						StartingAfter: "96b30ce8-6331-4c18-ae49-4155c3a2136c",
 					},
 				},
 			},
 			want: Want{
-				pathQuery: "/rules?starting_after=96b30ce8-6331-4c18-ae49-4155c3a2136c&sq=http://www1.example.org&tq=http://www2.example.org&limit=100",
+				pathQuery: "/hosts?starting_after=96b30ce8-6331-4c18-ae49-4155c3a2136c&limit=100",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := buildListRules(tt.args.options)
+			got := buildListHosts(tt.args.options)
 			td.Cmp(t, got, tt.want.pathQuery)
 		})
 	}

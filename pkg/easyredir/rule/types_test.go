@@ -7,7 +7,14 @@ import (
 	"github.com/MakeNowJust/heredoc"
 	"github.com/gotidy/ptr"
 	"github.com/maxatome/go-testdeep/td"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 )
+
+type WithBaseURL string
+
+func (u WithBaseURL) Apply(o *option.Options) {
+	o.BaseURL = string(u)
+}
 
 func TestRulesDataStringer(t *testing.T) {
 	tests := []struct {
