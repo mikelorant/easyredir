@@ -19,14 +19,17 @@ func TestSendRequest(t *testing.T) {
 	}
 
 	type Fields struct {
-		status int
-		header map[string]string
-		body   string
+		apiKey    string
+		apiSecret string
+		status    int
+		header    map[string]string
+		body      string
 	}
 
 	type Want struct {
-		body string
-		err  string
+		authorization string
+		body          string
+		err           string
 	}
 
 	tests := []struct {
@@ -43,7 +46,8 @@ func TestSendRequest(t *testing.T) {
 			want: Want{
 				body: "payload",
 			},
-		}, {
+		},
+		{
 			name: "ok_empty",
 			fields: Fields{
 				body: "",
@@ -51,7 +55,8 @@ func TestSendRequest(t *testing.T) {
 			want: Want{
 				body: "",
 			},
-		}, {
+		},
+		{
 			name: "custom_error",
 			fields: Fields{
 				status: http.StatusBadRequest,
@@ -74,7 +79,8 @@ func TestSendRequest(t *testing.T) {
 				body: "",
 				err:  "invalid_request_error: Invalid Request",
 			},
-		}, {
+		},
+		{
 			name: "generic_error",
 			fields: Fields{
 				status: http.StatusInternalServerError,
@@ -84,7 +90,8 @@ func TestSendRequest(t *testing.T) {
 				body: "",
 				err:  "received status code: 500",
 			},
-		}, {
+		},
+		{
 			name: "method_invalid",
 			args: Args{
 				method: "invalid method",
@@ -96,7 +103,8 @@ func TestSendRequest(t *testing.T) {
 				body: "",
 				err:  `net/http: invalid method "invalid method"`,
 			},
-		}, {
+		},
+		{
 			name: "rate_limited",
 			fields: Fields{
 				status: http.StatusTooManyRequests,
@@ -110,6 +118,32 @@ func TestSendRequest(t *testing.T) {
 			want: Want{
 				body: "",
 				err:  "rate limited with limit: 1, remaining: 2, reset: 3",
+			},
+		},
+		{
+			name: "api_key_secret",
+			fields: Fields{
+				apiKey:    "test",
+				apiSecret: "test",
+				body:      "",
+			},
+			want: Want{
+				authorization: "Basic dGVzdDp0ZXN0",
+				body:          "",
+			},
+		},
+		{
+			name: "post",
+			args: Args{
+				method: http.MethodPost,
+				body:   "payload",
+			},
+			fields: Fields{
+				status: http.StatusOK,
+				body:   "ok",
+			},
+			want: Want{
+				body: "ok",
 			},
 		},
 	}
@@ -131,8 +165,22 @@ func TestSendRequest(t *testing.T) {
 				status = tt.fields.status
 			}
 
+			authorization := "Basic Og=="
+			if tt.want.authorization != "" {
+				authorization = tt.want.authorization
+			}
+
 			mux := http.NewServeMux()
 			mux.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
+				if req.Method == http.MethodPatch || req.Method == http.MethodPost || req.Method == http.MethodPut {
+					_, ok := req.Header["Idempotency-Key"]
+					td.CmpTrue(t, ok)
+				}
+
+				td.Cmp(t, req.Header.Get("Authorization"), authorization)
+				td.Cmp(t, req.Header.Get("Content-Type"), ResourceType)
+				td.Cmp(t, req.Header.Get("Accept"), ResourceType)
+
 				for k, v := range tt.fields.header {
 					w.Header().Set(k, v)
 				}
@@ -142,7 +190,12 @@ func TestSendRequest(t *testing.T) {
 			server := httptest.NewServer(mux)
 			defer server.Close()
 
-			cl := NewClient(WithBaseURL(server.URL))
+			cl := NewClient(
+				WithAPIKey(tt.fields.apiKey),
+				WithAPISecret(tt.fields.apiSecret),
+				WithBaseURL(server.URL),
+			)
+
 			r, err := cl.SendRequest(path, method, strings.NewReader(tt.args.body))
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
