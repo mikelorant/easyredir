@@ -2,13 +2,14 @@ package jsonutil
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 )
 
 func DecodeJSON(r io.ReadCloser, v interface{}) error {
 	err := json.NewDecoder(r).Decode(v)
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return io.EOF
 	}
 	if err != nil {
