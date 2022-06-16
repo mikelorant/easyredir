@@ -1,18 +1,25 @@
 package easyredir
 
 import (
+	"net/http"
+
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
 type Easyredir struct {
-	Client *Client
+	Client *client.Client
+}
+
+type Doer interface {
+	Do(*http.Request) (*http.Response, error)
 }
 
 func New(opts ...option.Option) *Easyredir {
 	return &Easyredir{
-		Client: NewClient(opts...),
+		Client: client.New(opts...),
 	}
 }
 

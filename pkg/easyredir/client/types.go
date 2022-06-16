@@ -1,4 +1,4 @@
-package easyredir
+package client
 
 import (
 	"fmt"

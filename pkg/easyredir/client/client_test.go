@@ -1,4 +1,4 @@
-package easyredir
+package client
 
 import (
 	"io"
@@ -8,8 +8,27 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/stretchr/testify/assert"
 )
+
+type WithAPIKey string
+
+func (k WithAPIKey) Apply(o *option.Options) {
+	o.APIKey = string(k)
+}
+
+type WithAPISecret string
+
+func (s WithAPISecret) Apply(o *option.Options) {
+	o.APISecret = string(s)
+}
+
+type WithBaseURL string
+
+func (u WithBaseURL) Apply(o *option.Options) {
+	o.BaseURL = string(u)
+}
 
 func TestSendRequest(t *testing.T) {
 	type Args struct {
@@ -190,7 +209,7 @@ func TestSendRequest(t *testing.T) {
 			server := httptest.NewServer(mux)
 			defer server.Close()
 
-			cl := NewClient(
+			cl := New(
 				WithAPIKey(tt.fields.apiKey),
 				WithAPISecret(tt.fields.apiSecret),
 				WithBaseURL(server.URL),

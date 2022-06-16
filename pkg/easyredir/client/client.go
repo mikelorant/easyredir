@@ -1,4 +1,4 @@
-package easyredir
+package client
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
 )
 
-func NewClient(opts ...option.Option) *Client {
+func New(opts ...option.Option) *Client {
 	o := &option.Options{}
 
 	for _, opt := range opts {
