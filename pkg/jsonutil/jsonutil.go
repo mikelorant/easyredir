@@ -7,7 +7,11 @@ import (
 )
 
 func DecodeJSON(r io.ReadCloser, v interface{}) error {
-	if err := json.NewDecoder(r).Decode(v); err != nil {
+	err := json.NewDecoder(r).Decode(v)
+	if err == io.EOF {
+		return io.EOF
+	}
+	if err != nil {
 		return fmt.Errorf("unable to json decode: %w", err)
 	}
 	r.Close()
