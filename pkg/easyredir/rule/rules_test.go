@@ -268,7 +268,7 @@ func TestListRulesPaginator(t *testing.T) {
 					},
 					{
 						status: http.StatusOK,
-						body: `{ notjson }`,
+						body:   `{ notjson }`,
 					},
 				},
 			},

@@ -86,7 +86,7 @@ func TestListHosts(t *testing.T) {
 					},
 				},
 			},
-		},{
+		}, {
 			name: "error_invalid_json",
 			fields: Fields{
 				data: "notjson",
@@ -259,7 +259,7 @@ func TestListHostsPaginator(t *testing.T) {
 					},
 					{
 						status: http.StatusOK,
-						body: `{ notjson }`,
+						body:   `{ notjson }`,
 					},
 				},
 			},
