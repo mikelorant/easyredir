@@ -12,10 +12,16 @@ import (
 )
 
 func TestSendRequest(t *testing.T) {
+	type Args struct {
+		path   string
+		method string
+		body   string
+	}
+
 	type Fields struct {
-		method     string
-		statusCode int
-		body       []byte
+		status int
+		header map[string]string
+		body   string
 	}
 
 	type Want struct {
@@ -25,13 +31,14 @@ func TestSendRequest(t *testing.T) {
 
 	tests := []struct {
 		name   string
+		args   Args
 		fields Fields
 		want   Want
 	}{
 		{
 			name: "ok",
 			fields: Fields{
-				body: []byte("payload"),
+				body: "payload",
 			},
 			want: Want{
 				body: "payload",
@@ -39,7 +46,7 @@ func TestSendRequest(t *testing.T) {
 		}, {
 			name: "ok_empty",
 			fields: Fields{
-				body: []byte{},
+				body: "",
 			},
 			want: Want{
 				body: "",
@@ -47,8 +54,8 @@ func TestSendRequest(t *testing.T) {
 		}, {
 			name: "custom_error",
 			fields: Fields{
-				statusCode: http.StatusBadRequest,
-				body: []byte(`
+				status: http.StatusBadRequest,
+				body: `
 					{
 					  "type": "invalid_request_error",
 					  "message": "Invalid Request",
@@ -61,17 +68,17 @@ func TestSendRequest(t *testing.T) {
 					    }
 					  ]
 					}
-				`),
+				`,
 			},
 			want: Want{
 				body: "",
 				err:  "invalid_request_error: Invalid Request",
 			},
 		}, {
-			name: "status_code_error",
+			name: "generic_error",
 			fields: Fields{
-				statusCode: http.StatusInternalServerError,
-				body:       []byte("payload"),
+				status: http.StatusInternalServerError,
+				body:   "",
 			},
 			want: Want{
 				body: "",
@@ -79,13 +86,30 @@ func TestSendRequest(t *testing.T) {
 			},
 		}, {
 			name: "method_invalid",
-			fields: Fields{
+			args: Args{
 				method: "invalid method",
-				body:   []byte("payload"),
+			},
+			fields: Fields{
+				body: "",
 			},
 			want: Want{
 				body: "",
 				err:  `net/http: invalid method "invalid method"`,
+			},
+		}, {
+			name: "rate_limited",
+			fields: Fields{
+				status: http.StatusTooManyRequests,
+				header: map[string]string{
+					"X-Ratelimit-Limit":     "1",
+					"X-Ratelimit-Remaining": "2",
+					"X-Ratelimit-Reset":     "3",
+				},
+				body: "",
+			},
+			want: Want{
+				body: "",
+				err:  "rate limited with limit: 1, remaining: 2, reset: 3",
 			},
 		},
 	}
@@ -93,28 +117,33 @@ func TestSendRequest(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			path := "/"
+			if tt.args.path != "" {
+				path = tt.args.path
+			}
 
 			method := http.MethodGet
-			if tt.fields.method != "" {
-				method = tt.fields.method
+			if tt.args.method != "" {
+				method = tt.args.method
 			}
 
-			statusCode := http.StatusOK
-			if tt.fields.statusCode != 0 {
-				statusCode = tt.fields.statusCode
+			status := http.StatusOK
+			if tt.fields.status != 0 {
+				status = tt.fields.status
 			}
 
-			body := strings.NewReader("")
-
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(statusCode)
-				w.Write(tt.fields.body)
-			}))
+			mux := http.NewServeMux()
+			mux.HandleFunc(path, func(w http.ResponseWriter, req *http.Request) {
+				for k, v := range tt.fields.header {
+					w.Header().Set(k, v)
+				}
+				w.WriteHeader(status)
+				w.Write([]byte(tt.fields.body))
+			})
+			server := httptest.NewServer(mux)
 			defer server.Close()
 
 			cl := NewClient(WithBaseURL(server.URL))
-
-			r, err := cl.SendRequest(path, method, body)
+			r, err := cl.SendRequest(path, method, strings.NewReader(tt.args.body))
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
