@@ -1,12 +1,11 @@
 package rule
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"strings"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 
 	"github.com/gotidy/ptr"
@@ -14,39 +13,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockClient struct {
-	data string
-}
+type WithBaseURL string
 
-func (m *mockClient) SendRequest(path, method string, body io.Reader) (io.ReadCloser, error) {
-	r := strings.NewReader(m.data)
-	rc := io.NopCloser(r)
-	return rc, nil
-}
-
-type WithLimit int
-
-func (l WithLimit) Apply(o *option.Options) {
-	o.Limit = int(l)
-}
-
-type WithSourceFilter string
-
-func (s WithSourceFilter) Apply(o *option.Options) {
-	o.SourceFilter = string(s)
-}
-
-type WithTargetFilter string
-
-func (t WithTargetFilter) Apply(o *option.Options) {
-	o.TargetFilter = string(t)
+func (u WithBaseURL) Apply(o *option.Options) {
+	o.BaseURL = string(u)
 }
 
 func TestListRules(t *testing.T) {
-	type Args struct {
-		options []option.Option
-	}
-
 	type Fields struct {
 		data string
 	}
@@ -58,7 +31,6 @@ func TestListRules(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		args   Args
 		fields Fields
 		want   Want
 	}{
@@ -121,123 +93,6 @@ func TestListRules(t *testing.T) {
 				},
 			},
 		}, {
-			name: "with_source_filter",
-			args: Args{
-				options: []option.Option{
-					WithSourceFilter("https://www1.example.org"),
-				},
-			},
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-				},
-			},
-		}, {
-			name: "with_target_filter",
-			args: Args{
-				options: []option.Option{
-					WithTargetFilter("https://www2.example.org"),
-				},
-			},
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-				},
-			},
-		}, {
-			name: "with_both_source_target_filter",
-			args: Args{
-				options: []option.Option{
-					WithSourceFilter("https://www1.example.org"),
-					WithTargetFilter("https://www2.example.org"),
-				},
-			},
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-				},
-			},
-		}, {
-			name: "with_limit",
-			args: Args{
-				options: []option.Option{
-					WithLimit(1),
-				},
-			},
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-				},
-			},
-		}, {
 			name: "error_invalid_json",
 			fields: Fields{
 				data: "notjson",
@@ -253,11 +108,212 @@ func TestListRules(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := &mockClient{
-				data: tt.fields.data,
-			}
+			mux := http.NewServeMux()
+			mux.HandleFunc("/rules/", func(w http.ResponseWriter, req *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(tt.fields.data))
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
 
-			got, err := ListRules(cl, tt.args.options...)
+			cl := client.New(WithBaseURL(server.URL))
+
+			got, err := ListRules(cl)
+			if tt.want.err != "" {
+				assert.NotNil(t, err)
+				td.CmpContains(t, err, tt.want.err)
+				return
+			}
+			assert.Nil(t, err)
+			td.Cmp(t, got, tt.want.rules)
+		})
+	}
+}
+
+func TestListRulesPaginator(t *testing.T) {
+	type MockData struct {
+		status int
+		body   string
+	}
+
+	type Fields struct {
+		data []MockData
+	}
+
+	type Want struct {
+		rules Rules
+		err   string
+	}
+
+	tests := []struct {
+		name   string
+		fields Fields
+		want   Want
+	}{
+		{
+			name: "one",
+			fields: Fields{
+				data: []MockData{
+					{
+						status: http.StatusOK,
+						body: `
+							{
+							  "data": [
+							    {
+							      "id": "abc-def",
+							      "type": "rule"
+							    }
+							  ]
+							}
+						`,
+					},
+				},
+			},
+			want: Want{
+				rules: Rules{
+					Data: []Data{
+						{
+							ID:   "abc-def",
+							Type: "rule",
+						},
+					},
+					Metadata: option.Metadata{
+						HasMore: false,
+					},
+				},
+			},
+		},
+		{
+			name: "many",
+			fields: Fields{
+				data: []MockData{
+					{
+						status: http.StatusOK,
+						body: `
+							{
+							  "data": [
+							    {
+							      "id": "abc-def",
+							      "type": "rule"
+							    }
+							  ],
+							  "meta": {
+								  "has_more": true
+							  },
+							  "links": {
+								  "next": "/v1/rules?starting_after=abc-def"
+							  }
+							}
+						`,
+					},
+					{
+						status: http.StatusOK,
+						body: `
+							{
+							  "data": [
+							    {
+							      "id": "bcd-efg",
+							      "type": "rule"
+							    }
+							  ]
+							}
+						`,
+					},
+				},
+			},
+			want: Want{
+				rules: Rules{
+					Data: []Data{
+						{
+							ID:   "abc-def",
+							Type: "rule",
+						}, {
+							ID:   "bcd-efg",
+							Type: "rule",
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "none",
+			want: Want{
+				rules: Rules{
+					Data: []Data{},
+				},
+			},
+		},
+		{
+			name: "invalid_page",
+			fields: Fields{
+				data: []MockData{
+					{
+						status: http.StatusOK,
+						body: `
+							{
+							  "data": [
+							    {
+							      "id": "abc-def",
+							      "type": "rule"
+							    }
+							  ],
+							  "meta": {
+								  "has_more": true
+							  },
+							  "links": {
+								  "next": "/v1/rules?starting_after=abc-def"
+							  }
+							}
+						`,
+					},
+					{
+						status: http.StatusOK,
+						body: `{ notjson }`,
+					},
+				},
+			},
+			want: Want{
+				rules: Rules{
+					Data: []Data{
+						{
+							ID:   "abc-def",
+							Type: "rule",
+						},
+					},
+				},
+				err: "unable to get a rules page",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			page := func() func() int {
+				i := 0
+				return func() int {
+					i++
+					return i - 1
+				}
+			}()
+
+			mux := http.NewServeMux()
+			mux.HandleFunc("/rules/", func(w http.ResponseWriter, req *http.Request) {
+				if len(tt.fields.data) < 1 {
+					w.WriteHeader(http.StatusOK)
+					w.Write([]byte("{}"))
+					return
+				}
+
+				data := tt.fields.data[page()]
+				w.WriteHeader(data.status)
+				w.Write([]byte(data.body))
+			})
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			cl := client.New(WithBaseURL(server.URL))
+
+			got, err := ListRulesPaginator(cl)
 			if tt.want.err != "" {
 				assert.NotNil(t, err)
 				td.CmpContains(t, err, tt.want.err)
@@ -378,194 +434,6 @@ func TestBuildListRules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := buildListRules(tt.args.options)
 			td.Cmp(t, got, tt.want.pathQuery)
-		})
-	}
-}
-
-type mockPaginatorClient struct {
-	idx  int
-	data string
-}
-
-func (m *mockPaginatorClient) SendRequest(path, method string, body io.Reader) (io.ReadCloser, error) {
-	data := strings.NewReader(m.data)
-	docs := make(map[int]interface{})
-	dec := json.NewDecoder(data)
-
-	i := 0
-	for {
-		var doc map[string]interface{}
-		err := dec.Decode(&doc)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, fmt.Errorf("unable to decode json page %v: %w", i, err)
-		}
-		docs[i] = doc
-		i++
-	}
-
-	b, err := json.Marshal(docs[m.idx])
-	if err != nil {
-		return nil, fmt.Errorf("unable to encode json page %v: %w", i, err)
-	}
-
-	r := strings.NewReader(string(b))
-	rc := io.NopCloser(r)
-
-	m.idx++
-
-	return rc, nil
-}
-
-func TestListRulesPaginator(t *testing.T) {
-	type Args struct {
-		options []option.Option
-	}
-
-	type Fields struct {
-		data string
-	}
-
-	type Want struct {
-		rules Rules
-		err   string
-	}
-
-	tests := []struct {
-		name   string
-		args   Args
-		fields Fields
-		want   Want
-	}{
-		{
-			name: "one",
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-					Metadata: option.Metadata{
-						HasMore: false,
-					},
-				},
-			},
-		},
-		{
-			name: "many",
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ],
-					  "meta": {
-						  "has_more": true
-					  },
-					  "links": {
-						  "next": "/v1/rules?starting_after=abc-def"
-					  }
-					}
-					{
-					  "data": [
-					    {
-					      "id": "bcd-efg",
-					      "type": "rule"
-					    }
-					  ]
-					}
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						}, {
-							ID:   "bcd-efg",
-							Type: "rule",
-						},
-					},
-				},
-			},
-		},
-		{
-			name: "none",
-			want: Want{
-				rules: Rules{
-					Data: []Data{},
-				},
-			},
-		},
-		{
-			name: "invalid_page",
-			fields: Fields{
-				data: `
-					{
-					  "data": [
-					    {
-					      "id": "abc-def",
-					      "type": "rule"
-					    }
-					  ],
-					  "meta": {
-						  "has_more": true
-					  },
-					  "links": {
-						  "next": "/v1/rules?starting_after=abc-def"
-					  }
-					}
-					{ notjson }
-				`,
-			},
-			want: Want{
-				rules: Rules{
-					Data: []Data{
-						{
-							ID:   "abc-def",
-							Type: "rule",
-						},
-					},
-				},
-				err: "unable to get a rules page",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cl := &mockPaginatorClient{
-				data: tt.fields.data,
-			}
-
-			got, err := ListRulesPaginator(cl, tt.args.options...)
-			if tt.want.err != "" {
-				assert.NotNil(t, err)
-				td.CmpContains(t, err, tt.want.err)
-				return
-			}
-			assert.Nil(t, err)
-			td.Cmp(t, got, tt.want.rules)
 		})
 	}
 }
