@@ -70,6 +70,16 @@ func Run() error {
 		fmt.Print(r)
 
 		return nil
+
+	case "remove":
+		res, err := e.RemoveRule(os.Args[2])
+		if err != nil {
+			return fmt.Errorf("unable to remove rule: %w", err)
+		}
+
+		fmt.Print(res)
+
+		return nil
 	}
 
 	return nil

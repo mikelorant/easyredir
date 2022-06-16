@@ -31,12 +31,16 @@ func (c *Easyredir) ListRules(opts ...option.Option) (r rule.Rules, err error) {
 	return rule.ListRulesPaginator(c.Client, opts...)
 }
 
-func (c *Easyredir) ListHosts(opts ...option.Option) (h host.Hosts, err error) {
-	return host.ListHostsPaginator(c.Client, opts...)
+func (c *Easyredir) RemoveRule(id string) (res bool, err error) {
+	return rule.RemoveRule(c.Client, id)
 }
 
 func (c *Easyredir) GetHost(id string) (h host.Host, err error) {
 	return host.GetHost(c.Client, id)
+}
+
+func (c *Easyredir) ListHosts(opts ...option.Option) (h host.Hosts, err error) {
+	return host.ListHostsPaginator(c.Client, opts...)
 }
 
 type WithLimit int
