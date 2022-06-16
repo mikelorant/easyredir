@@ -20,5 +20,6 @@ type Options struct {
 	SourceFilter string
 	TargetFilter string
 	Limit        int
+	Include      string
 	Pagination   Pagination
 }

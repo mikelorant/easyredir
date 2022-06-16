@@ -19,6 +19,11 @@ type Rules struct {
 	Links    option.Links    `json:"links"`
 }
 
+type Rule struct {
+	Data          Data
+	Relationships Relationships
+}
+
 type Data struct {
 	ID            string        `json:"id"`
 	Type          string        `json:"type"`
@@ -58,6 +63,12 @@ const (
 	ResponseMovedPermanently ResponseType = "moved permanently"
 	ResponseFound            ResponseType = "found"
 )
+
+func (r Rule) String() string {
+	str, _ := structutil.Sprint(r)
+
+	return str
+}
 
 func (r Data) String() string {
 	str, _ := structutil.Sprint(r)

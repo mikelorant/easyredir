@@ -23,6 +23,10 @@ func New(opts ...option.Option) *Easyredir {
 	}
 }
 
+func (c *Easyredir) CreateRule(attr rule.Attributes, opts ...option.Option) (r rule.Rule, err error) {
+	return rule.CreateRule(c.Client, attr, opts...)
+}
+
 func (c *Easyredir) ListRules(opts ...option.Option) (r rule.Rules, err error) {
 	return rule.ListRulesPaginator(c.Client, opts...)
 }
@@ -69,6 +73,12 @@ type WithBaseURL string
 
 func (u WithBaseURL) Apply(o *option.Options) {
 	o.BaseURL = string(u)
+}
+
+type WithInclude string
+
+func (i WithInclude) Apply(o *option.Options) {
+	o.Include = string(i)
 }
 
 type WithHTTPClient struct {

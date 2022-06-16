@@ -14,3 +14,11 @@ func DecodeJSON(r io.ReadCloser, v interface{}) error {
 
 	return nil
 }
+
+func EncodeJSON(v interface{}, w io.Writer) error {
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		return fmt.Errorf("unable to json encode: %w", err)
+	}
+
+	return nil
+}

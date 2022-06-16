@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gotidy/ptr"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
 )
 
 func Run() error {
@@ -46,6 +48,26 @@ func Run() error {
 		}
 
 		fmt.Print(h)
+
+		return nil
+
+	case "create":
+		attr := rule.Attributes{
+			ForwardParams: ptr.Bool(true),
+			ForwardPath:   ptr.Bool(true),
+			ResponseType:  ptr.String("moved_permanently"),
+			SourceURLs: []string{
+				"source.example.com",
+			},
+			TargetURL: ptr.String("target.example.com"),
+		}
+
+		r, err := e.CreateRule(attr)
+		if err != nil {
+			return fmt.Errorf("unable to create rule: %w", err)
+		}
+
+		fmt.Print(r)
 
 		return nil
 	}
