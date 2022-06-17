@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
 
 func ListRulesPaginator(cl ClientAPI, opts ...option.Option) (r Rules, err error) {

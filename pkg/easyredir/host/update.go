@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
 
 func UpdateHost(cl ClientAPI, id string, attr Attributes, opts ...option.Option) (h Host, err error) {

@@ -1,4 +1,4 @@
-module github.com/mikelorant/easyredir-cli
+module github.com/mikelorant/easyredir
 
 go 1.18
 

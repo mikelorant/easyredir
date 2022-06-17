@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
 
 func New(opts ...option.Option) *Client {

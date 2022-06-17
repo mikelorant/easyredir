@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
 
 func UpdateRule(cl ClientAPI, id string, attr Attributes, opts ...option.Option) (r Rule, err error) {

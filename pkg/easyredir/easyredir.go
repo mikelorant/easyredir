@@ -3,10 +3,10 @@ package easyredir
 import (
 	"net/http"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
+	"github.com/mikelorant/easyredir/pkg/easyredir/client"
+	"github.com/mikelorant/easyredir/pkg/easyredir/host"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/easyredir/rule"
 )
 
 type Easyredir struct {

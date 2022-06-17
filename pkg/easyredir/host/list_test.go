@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/easyredir/client"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/stretchr/testify/assert"

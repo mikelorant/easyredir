@@ -6,7 +6,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/maxatome/go-testdeep/td"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 )
 
 type WithBaseURL string

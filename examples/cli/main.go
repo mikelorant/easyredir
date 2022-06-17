@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/alexflint/go-arg"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
+	"github.com/mikelorant/easyredir/pkg/easyredir"
+	"github.com/mikelorant/easyredir/pkg/easyredir/host"
+	"github.com/mikelorant/easyredir/pkg/easyredir/rule"
 )
 
 type CreateCmd struct {

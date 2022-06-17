@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 	"github.com/stretchr/testify/assert"
 )
 

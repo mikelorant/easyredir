@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/maxatome/go-testdeep/td"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/client"
+	"github.com/mikelorant/easyredir/pkg/easyredir/client"
 	"github.com/stretchr/testify/assert"
 )
 

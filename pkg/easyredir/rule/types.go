@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
-	"github.com/mikelorant/easyredir-cli/pkg/structutil"
+	"github.com/mikelorant/easyredir/pkg/easyredir/host"
+	"github.com/mikelorant/easyredir/pkg/easyredir/option"
+	"github.com/mikelorant/easyredir/pkg/structutil"
 )
 
 type ClientAPI interface {

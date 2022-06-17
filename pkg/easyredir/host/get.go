@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mikelorant/easyredir-cli/pkg/jsonutil"
+	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
 
 func GetHost(cl ClientAPI, id string) (h Host, err error) {

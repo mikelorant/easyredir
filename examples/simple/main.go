@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir"
-	"github.com/mikelorant/easyredir-cli/pkg/easyredir/rule"
+	"github.com/mikelorant/easyredir/pkg/easyredir"
+	"github.com/mikelorant/easyredir/pkg/easyredir/rule"
 )
 
 func main() {
