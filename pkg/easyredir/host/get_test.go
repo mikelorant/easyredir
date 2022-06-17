@@ -50,7 +50,7 @@ func TestGetHosts(t *testing.T) {
 			},
 			want: Want{
 				host: Host{
-					Data: DataExtended{
+					Data: Data{
 						ID:   "abc-123",
 						Type: "host",
 					},

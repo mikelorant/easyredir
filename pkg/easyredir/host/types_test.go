@@ -30,12 +30,6 @@ func TestHostsDataStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: abc-def
 				type: host
-				attributes:
-				  name: ""
-				  dns_status: ""
-				  certificate_status: ""
-				links:
-				  self: ""
 			`),
 		},
 		{
@@ -44,12 +38,6 @@ func TestHostsDataStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: ""
 				type: ""
-				attributes:
-				  name: ""
-				  dns_status: ""
-				  certificate_status: ""
-				links:
-				  self: ""
 			`),
 		},
 	}
@@ -81,12 +69,6 @@ func TestHostsStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: abc-def
 				type: host
-				attributes:
-				  name: ""
-				  dns_status: ""
-				  certificate_status: ""
-				links:
-				  self: ""
 
 				Total: 1
 			`),

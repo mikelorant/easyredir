@@ -15,63 +15,50 @@ type ClientAPI interface {
 
 type Hosts struct {
 	Data     []Data          `json:"data"`
-	Metadata option.Metadata `json:"meta"`
-	Links    option.Links    `json:"links"`
+	Metadata option.Metadata `json:"meta,omitempty"`
+	Links    option.Links    `json:"links,omitempty"`
+}
+
+type Host struct {
+	Data Data
 }
 
 type Data struct {
 	ID         string     `json:"id"`
 	Type       string     `json:"type"`
-	Attributes Attributes `json:"attributes"`
-	Links      Links      `json:"links"`
+	Attributes Attributes `json:"attributes,omitempty"`
+	Links      Links      `json:"links,omitempty"`
 }
 
 type Attributes struct {
-	Name              string            `json:"name"`
-	DNSStatus         DNSStatus         `json:"dns_status"`
-	CertificateStatus CertificateStatus `json:"certificate_status"`
+	Name               string             `json:"name,omitempty"`
+	DNSStatus          DNSStatus          `json:"dns_status,omitempty"`
+	DNSTestedAt        string             `json:"dns_tested_at,omitempty"` // TODO: time.Time
+	CertificateStatus  string             `json:"certificate_status,omitempty"`
+	ACMEEnabled        *bool              `json:"acme_enabled,omitempty"`
+	MatchOptions       MatchOptions       `json:"match_options,omitempty"`
+	NotFoundAction     NotFoundAction     `json:"not_found_action,omitempty"`
+	Security           Security           `json:"security,omitempty"`
+	RequiredDNSEntries RequiredDNSEntries `json:"required_dns_entries,omitempty"`
+	DetectedDNSEntries []DNSValues        `json:"detected_dns_entries,omitempty"`
 }
 
 type Links struct {
-	Self string `json:"self"`
-}
-
-type Host struct {
-	Data DataExtended
-}
-
-type DataExtended struct {
-	ID         string             `json:"id"`
-	Type       string             `json:"type"`
-	Attributes AttributesExtended `json:"attributes"`
-	Links      Links              `json:"links"`
-}
-
-type AttributesExtended struct {
-	Name               string             `json:"name"`
-	DNSStatus          DNSStatus          `json:"dns_status"`
-	DNSTestedAt        string             `json:"dns_tested_at"` // TODO: time.Time
-	CertificateStatus  string             `json:"certificate_status"`
-	ACMEEnabled        bool               `json:"acme_enabled"`
-	MatchOptions       MatchOptions       `json:"match_options"`
-	NotFoundAction     NotFoundActions    `json:"not_found_action"`
-	Security           Security           `json:"security"`
-	RequiredDNSEntries RequiredDNSEntries `json:"required_dns_entries"`
-	DetectedDNSEntries []DNSValues        `json:"detected_dns_entries"`
+	Self string `json:"self,omitempty"`
 }
 
 type MatchOptions struct {
-	CaseInsensitive  *bool `json:"case_insensitive"`
-	SlashInsensitive *bool `json:"slash_insensitive"`
+	CaseInsensitive  *bool `json:"case_insensitive,omitempty"`
+	SlashInsensitive *bool `json:"slash_insensitive,omitempty"`
 }
 
-type NotFoundActions struct {
-	ForwardParams        *bool         `json:"forward_params"`
-	ForwardPath          *bool         `json:"forward_path"`
-	Custom404Body        *string       `json:"custom_404_body"`
-	Custom404BodyPresent bool          `json:"custom_404_body_present"`
-	ResponseCode         *ResponseCode `json:"response_code"`
-	ResponseURL          *string       `json:"response_url"`
+type NotFoundAction struct {
+	ForwardParams        *bool         `json:"forward_params,omitempty"`
+	ForwardPath          *bool         `json:"forward_path,omitempty"`
+	Custom404Body        *string       `json:"my_custom_404_body,omitempty"`
+	Custom404BodyPresent *bool         `json:"custom_404_body_present,omitempty"` // TODO: Marked as string in example
+	ResponseCode         *ResponseCode `json:"response_code,omitempty"`
+	ResponseURL          *string       `json:"response_url,omitempty"`
 }
 
 type Security struct {
@@ -83,13 +70,13 @@ type Security struct {
 }
 
 type RequiredDNSEntries struct {
-	Recommended  DNSValues   `json:"recommended"`
-	Alternatives []DNSValues `json:"alternatives"`
+	Recommended  DNSValues   `json:"recommended,omitempty"`
+	Alternatives []DNSValues `json:"alternatives,omitempty"`
 }
 
 type DNSValues struct {
-	Type   string          `json:"type"`
-	Values []DNSValuesType `json:"values"`
+	Type   DNSValuesType `json:"type,omitempty"`
+	Values []string		 `json:"values,omitempty"`
 }
 
 type DNSValuesType string
@@ -143,12 +130,10 @@ func (h Hosts) String() string {
 	return strings.Join(ss, "\n")
 }
 
-func (h DataExtended) String() string {
-	str, _ := structutil.Sprint(h)
-
-	return str
-}
-
 func (h Host) String() string {
 	return fmt.Sprint(h.Data)
+}
+
+func ref[T any](x T) *T {
+    return &x
 }
