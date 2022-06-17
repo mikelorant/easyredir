@@ -38,7 +38,7 @@ func TestUpdateRule(t *testing.T) {
 				attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
 					ForwardPath: ptr.Bool(true),
-					ResponseType: ptr.String("moved_permanently"),
+					ResponseType: ref(ResponseMovedPermanently),
 					SourceURLs: []string{
 						"abc.com",
 						"abc.com/123",
@@ -88,7 +88,7 @@ func TestUpdateRule(t *testing.T) {
 						Attributes: Attributes{
 							ForwardParams: ptr.Bool(true),
 							ForwardPath:   ptr.Bool(true),
-							ResponseType:  ptr.String("moved_permanently"), // TODO
+							ResponseType:  ref(ResponseMovedPermanently),
 							SourceURLs: []string{
 								"abc.com",
 								"abc.com/123",
@@ -119,7 +119,7 @@ func TestUpdateRule(t *testing.T) {
 				attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
 					ForwardPath: ptr.Bool(true),
-					ResponseType: ptr.String("moved_permanently"),
+					ResponseType: ref(ResponseMovedPermanently),
 					SourceURLs: []string{},
 					TargetURL: ptr.String("otherdomain.com"),
 				},

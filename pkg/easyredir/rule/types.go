@@ -36,7 +36,7 @@ type Data struct {
 type Attributes struct {
 	ForwardParams *bool    `json:"forward_params,omitempty"`
 	ForwardPath   *bool    `json:"forward_path,omitempty"`
-	ResponseType  *string  `json:"response_type,omitempty"`
+	ResponseType  *ResponseType  `json:"response_type,omitempty"`
 	SourceURLs    []string `json:"source_urls,omitempty"`
 	TargetURL     *string  `json:"target_url,omitempty"`
 }
@@ -62,7 +62,7 @@ type SourceHostsLinks struct {
 }
 
 const (
-	ResponseMovedPermanently ResponseType = "moved permanently"
+	ResponseMovedPermanently ResponseType = "moved_permanently"
 	ResponseFound            ResponseType = "found"
 )
 
@@ -87,4 +87,8 @@ func (r Rules) String() string {
 	}
 	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
 	return strings.Join(ss, "\n")
+}
+
+func ref[T any](x T) *T {
+    return &x
 }

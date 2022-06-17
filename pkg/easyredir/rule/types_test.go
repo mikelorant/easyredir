@@ -41,7 +41,7 @@ func TestRulesDataStringer(t *testing.T) {
 				Attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
 					ForwardPath:   ptr.Bool(true),
-					ResponseType:  ptr.String("moved_permanently"),
+					ResponseType:  ref(ResponseMovedPermanently),
 					SourceURLs: []string{
 						"http://www1.example.org",
 						"http://www2.example.org",
