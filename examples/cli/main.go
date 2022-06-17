@@ -11,73 +11,59 @@ import (
 )
 
 type CreateCmd struct {
-	Rule *CreateRuleCmd `arg:"subcommand:rule"`
-}
-
-type CreateRuleCmd struct {
-	ForwardParams *bool              `arg:"--forward-params,required"`
-	ForwardPath   *bool              `arg:"--forward-path,required"`
-	ResponseType  *rule.ResponseType `arg:"--response-type,required"`
-	SourceURLs    []string           `arg:"--source-url,required"`
-	TargetURL     *string            `arg:"--target-url,required"`
+	Rule *struct {
+		ForwardParams *bool              `arg:"--forward-params,required"`
+		ForwardPath   *bool              `arg:"--forward-path,required"`
+		ResponseType  *rule.ResponseType `arg:"--response-type,required"`
+		SourceURLs    []string           `arg:"--source-url,required"`
+		TargetURL     *string            `arg:"--target-url,required"`
+	} `arg:"subcommand:rule"`
 }
 
 type GetCmd struct {
-	Host *GetHostCmd `arg:"subcommand:host"`
-}
-
-type GetHostCmd struct {
-	ID string `arg:"positional"`
+	Host *struct {
+		ID string `arg:"positional"`
+	} `arg:"subcommand:host"`
 }
 
 type ListCmd struct {
-	Host *ListHostsCmd `arg:"subcommand:hosts"`
-	Rule *ListRulesCmd `arg:"subcommand:rules"`
-}
-
-type ListHostsCmd struct{}
-
-type ListRulesCmd struct {
-	SourceFilter string `arg:"--source-filter"`
-	TargetFilter string `arg:"--target-filter"`
+	Host *struct{} `arg:"subcommand:hosts"`
+	Rule *struct {
+		SourceFilter string `arg:"--source-filter"`
+		TargetFilter string `arg:"--target-filter"`
+	} `arg:"subcommand:rules"`
 }
 
 type RemoveCmd struct {
-	Rule *RemoveRuleCmd `arg:"subcommand:rule"`
-}
-
-type RemoveRuleCmd struct {
-	ID string `arg:"positional"`
+	Rule *struct {
+		ID string `arg:"positional"`
+	} `arg:"subcommand:rule"`
 }
 
 type UpdateCmd struct {
-	Host *UpdateHostCmd `arg:"subcommand:host"`
-	Rule *UpdateRuleCmd `arg:"subcommand:rule"`
-}
-
-type UpdateHostCmd struct {
-	ID                      string             `arg:"positional"`
-	CaseInsensitive         *bool              `arg:"--case-insenstive"`
-	SlashInsensitive        *bool              `arg:"--slash-insensitive"`
-	ForwardParams           *bool              `arg:"--forward-params"`
-	ForwardPath             *bool              `arg:"--forward-path"`
-	Custom404Body           *string            `arg:"--custom-404-body"`
-	ResponseCode            *host.ResponseCode `arg:"--response-code"`
-	ResponseURL             *string            `arg:"--response-url"`
-	HTTPSUpgrade            *bool              `arg:"--https-upgrade"`
-	PreventForeignEmbedding *bool              `arg:"--prevent-foreign-embedding"`
-	HSTSIncludeSubDomains   *bool              `arg:"--hsts-include-sub-domains"`
-	HSTSMaxAge              *int               `arg:"--hsts-max-age"`
-	HSTSPreload             *bool              `arg:"--hsts-preload"`
-}
-
-type UpdateRuleCmd struct {
-	ID            string             `arg:"positional"`
-	ForwardParams *bool              `arg:"--forward-params"`
-	ForwardPath   *bool              `arg:"--forward-path"`
-	ResponseType  *rule.ResponseType `arg:"--response-type"`
-	SourceURLs    []string           `arg:"--source-url"`
-	TargetURL     *string            `arg:"--target-url"`
+	Host *struct {
+		ID                      string             `arg:"positional"`
+		CaseInsensitive         *bool              `arg:"--case-insenstive"`
+		SlashInsensitive        *bool              `arg:"--slash-insensitive"`
+		ForwardParams           *bool              `arg:"--forward-params"`
+		ForwardPath             *bool              `arg:"--forward-path"`
+		Custom404Body           *string            `arg:"--custom-404-body"`
+		ResponseCode            *host.ResponseCode `arg:"--response-code"`
+		ResponseURL             *string            `arg:"--response-url"`
+		HTTPSUpgrade            *bool              `arg:"--https-upgrade"`
+		PreventForeignEmbedding *bool              `arg:"--prevent-foreign-embedding"`
+		HSTSIncludeSubDomains   *bool              `arg:"--hsts-include-sub-domains"`
+		HSTSMaxAge              *int               `arg:"--hsts-max-age"`
+		HSTSPreload             *bool              `arg:"--hsts-preload"`
+	} `arg:"subcommand:host"`
+	Rule *struct {
+		ID            string             `arg:"positional"`
+		ForwardParams *bool              `arg:"--forward-params"`
+		ForwardPath   *bool              `arg:"--forward-path"`
+		ResponseType  *rule.ResponseType `arg:"--response-type"`
+		SourceURLs    []string           `arg:"--source-url"`
+		TargetURL     *string            `arg:"--target-url"`
+	} `arg:"subcommand:rule"`
 }
 
 var args struct {
