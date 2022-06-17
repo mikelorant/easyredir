@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/mikelorant/easyredir-cli/pkg/easyredir/host"
 	"github.com/mikelorant/easyredir-cli/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir-cli/pkg/structutil"
 )
@@ -21,14 +22,15 @@ type Rules struct {
 
 type Rule struct {
 	Data          Data
-	Relationships Relationships
+	Relationships Relationships `json:"relationships,omitempty"` // API docs are incorrect
+	Included	  []host.Data	`json:"included,omitempty"`
 }
 
 type Data struct {
 	ID            string        `json:"id"`
 	Type          string        `json:"type"`
 	Attributes    Attributes    `json:"attributes,omitempty"`
-	Relationships Relationships `json:"relationships,omitempty"`
+	Relationships Relationships `json:"relationships,omitempty"` // API docs are incorrect
 }
 
 type Attributes struct {
