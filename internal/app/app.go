@@ -71,6 +71,22 @@ func Run() error {
 
 		return nil
 
+	case "update":
+		attr := rule.Attributes{
+			SourceURLs: []string{
+				"source2.example.com",
+			},
+		}
+
+		r, err := e.UpdateRule(os.Args[2], attr, easyredir.WithInclude("source_hosts"))
+		if err != nil {
+			return fmt.Errorf("unable to create rule: %w", err)
+		}
+
+		fmt.Print(r)
+
+		return nil
+
 	case "remove":
 		res, err := e.RemoveRule(os.Args[2])
 		if err != nil {

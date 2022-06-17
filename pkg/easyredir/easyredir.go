@@ -35,6 +35,10 @@ func (c *Easyredir) RemoveRule(id string) (res bool, err error) {
 	return rule.RemoveRule(c.Client, id)
 }
 
+func (c *Easyredir) UpdateRule(id string, attr rule.Attributes, opts ...option.Option) (r rule.Rule, err error) {
+	return rule.UpdateRule(c.Client, id, attr, opts...)
+}
+
 func (c *Easyredir) GetHost(id string) (h host.Host, err error) {
 	return host.GetHost(c.Client, id)
 }
