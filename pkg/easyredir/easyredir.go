@@ -47,6 +47,10 @@ func (c *Easyredir) ListHosts(opts ...option.Option) (h host.Hosts, err error) {
 	return host.ListHostsPaginator(c.Client, opts...)
 }
 
+func (c *Easyredir) UpdateHost(id string, attr host.Attributes, opts ...option.Option) (h host.Host, err error) {
+	return host.UpdateHost(c.Client, id, attr, opts...)
+}
+
 type WithLimit int
 
 func (l WithLimit) Apply(o *option.Options) {
