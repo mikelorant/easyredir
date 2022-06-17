@@ -13,23 +13,23 @@ import (
 
 func TestUpdateRule(t *testing.T) {
 	type Args struct {
-		id			string
-		attributes	Attributes
+		id         string
+		attributes Attributes
 	}
 	type Fields struct {
-		status	int
-		body	string
+		status int
+		body   string
 	}
-	type Want struct{
-		rule	Rule
-		err		string
+	type Want struct {
+		rule Rule
+		err  string
 	}
 
-	tests := []struct{
-		name	string
-		args	Args
-		fields	Fields
-		want	Want
+	tests := []struct {
+		name   string
+		args   Args
+		fields Fields
+		want   Want
 	}{
 		{
 			name: "success",
@@ -37,8 +37,8 @@ func TestUpdateRule(t *testing.T) {
 				id: "5d29f819-302f-40c0-8b5a-6d670267615b",
 				attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
-					ForwardPath: ptr.Bool(true),
-					ResponseType: ref(ResponseMovedPermanently),
+					ForwardPath:   ptr.Bool(true),
+					ResponseType:  ref(ResponseMovedPermanently),
 					SourceURLs: []string{
 						"abc.com",
 						"abc.com/123",
@@ -118,10 +118,10 @@ func TestUpdateRule(t *testing.T) {
 				id: "5d29f819-302f-40c0-8b5a-6d670267615b",
 				attributes: Attributes{
 					ForwardParams: ptr.Bool(true),
-					ForwardPath: ptr.Bool(true),
-					ResponseType: ref(ResponseMovedPermanently),
-					SourceURLs: []string{},
-					TargetURL: ptr.String("otherdomain.com"),
+					ForwardPath:   ptr.Bool(true),
+					ResponseType:  ref(ResponseMovedPermanently),
+					SourceURLs:    []string{},
+					TargetURL:     ptr.String("otherdomain.com"),
 				},
 			},
 			fields: Fields{
@@ -143,7 +143,7 @@ func TestUpdateRule(t *testing.T) {
 			},
 			want: Want{
 				rule: Rule{},
-				err: "invalid_request_error: Invalid Request",
+				err:  "invalid_request_error: Invalid Request",
 			},
 		},
 	}

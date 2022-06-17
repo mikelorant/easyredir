@@ -23,7 +23,7 @@ type Rules struct {
 type Rule struct {
 	Data          Data
 	Relationships Relationships `json:"relationships,omitempty"` // API docs are incorrect
-	Included	  []host.Data	`json:"included,omitempty"`
+	Included      []host.Data   `json:"included,omitempty"`
 }
 
 type Data struct {
@@ -34,11 +34,11 @@ type Data struct {
 }
 
 type Attributes struct {
-	ForwardParams *bool    `json:"forward_params,omitempty"`
-	ForwardPath   *bool    `json:"forward_path,omitempty"`
-	ResponseType  *ResponseType  `json:"response_type,omitempty"`
-	SourceURLs    []string `json:"source_urls,omitempty"`
-	TargetURL     *string  `json:"target_url,omitempty"`
+	ForwardParams *bool         `json:"forward_params,omitempty"`
+	ForwardPath   *bool         `json:"forward_path,omitempty"`
+	ResponseType  *ResponseType `json:"response_type,omitempty"`
+	SourceURLs    []string      `json:"source_urls,omitempty"`
+	TargetURL     *string       `json:"target_url,omitempty"`
 }
 
 type ResponseType string
@@ -90,5 +90,5 @@ func (r Rules) String() string {
 }
 
 func ref[T any](x T) *T {
-    return &x
+	return &x
 }

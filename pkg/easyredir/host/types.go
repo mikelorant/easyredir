@@ -76,7 +76,7 @@ type RequiredDNSEntries struct {
 
 type DNSValues struct {
 	Type   DNSValuesType `json:"type,omitempty"`
-	Values []string		 `json:"values,omitempty"`
+	Values []string      `json:"values,omitempty"`
 }
 
 type DNSValuesType string
@@ -135,5 +135,5 @@ func (h Host) String() string {
 }
 
 func ref[T any](x T) *T {
-    return &x
+	return &x
 }

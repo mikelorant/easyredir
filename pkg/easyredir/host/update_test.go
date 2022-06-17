@@ -13,23 +13,23 @@ import (
 
 func TestUpdateHost(t *testing.T) {
 	type Args struct {
-		id 			string
-		attributes	Attributes
+		id         string
+		attributes Attributes
 	}
 	type Fields struct {
-		status	int
-		body	string
+		status int
+		body   string
 	}
 	type Want struct {
-		host	Host
-		err		string
+		host Host
+		err  string
 	}
 
-	tests := []struct{
-		name	string
-		args	Args
-		fields	Fields
-		want	Want
+	tests := []struct {
+		name   string
+		args   Args
+		fields Fields
+		want   Want
 	}{
 		{
 			name: "success",
@@ -37,22 +37,22 @@ func TestUpdateHost(t *testing.T) {
 				id: "b8a2287c-5580-41e8-8b8c-438231dd6875",
 				attributes: Attributes{
 					MatchOptions: MatchOptions{
-						CaseInsensitive: ptr.Bool(true),
+						CaseInsensitive:  ptr.Bool(true),
 						SlashInsensitive: ptr.Bool(true),
 					},
 					NotFoundAction: NotFoundAction{
 						ForwardParams: ptr.Bool(true),
-						ForwardPath: ptr.Bool(true),
+						ForwardPath:   ptr.Bool(true),
 						Custom404Body: ptr.String("<html><body>My Custom 404 content.</body></html>"),
-						ResponseCode: ref(ResponseCodeFound),
-						ResponseURL: ptr.String("https://www.example.com"),
+						ResponseCode:  ref(ResponseCodeFound),
+						ResponseURL:   ptr.String("https://www.example.com"),
 					},
 					Security: Security{
-						HTTPSUpgrade: ptr.Bool(true),
+						HTTPSUpgrade:            ptr.Bool(true),
 						PreventForeignEmbedding: ptr.Bool(true),
-						HSTSIncludeSubDomains: ptr.Bool(true),
-						HSTSMaxAge: ptr.Int(31536000),
-						HSTSPreload: ptr.Bool(true),
+						HSTSIncludeSubDomains:   ptr.Bool(true),
+						HSTSMaxAge:              ptr.Int(31536000),
+						HSTSPreload:             ptr.Bool(true),
 					},
 				},
 			},
@@ -125,31 +125,31 @@ func TestUpdateHost(t *testing.T) {
 			want: Want{
 				host: Host{
 					Data: Data{
-						ID: "abc-def",
+						ID:   "abc-def",
 						Type: "host",
 						Attributes: Attributes{
-							Name: "easyredir.com",
-							DNSStatus: "active",
-							DNSTestedAt: "2020-11-24T22:33:35Z",
+							Name:              "easyredir.com",
+							DNSStatus:         "active",
+							DNSTestedAt:       "2020-11-24T22:33:35Z",
 							CertificateStatus: "active",
-							ACMEEnabled: ptr.Bool(true),
+							ACMEEnabled:       ptr.Bool(true),
 							MatchOptions: MatchOptions{
-								CaseInsensitive: ptr.Bool(true),
+								CaseInsensitive:  ptr.Bool(true),
 								SlashInsensitive: ptr.Bool(true),
 							},
 							NotFoundAction: NotFoundAction{
-								ForwardParams: ptr.Bool(true),
-								ForwardPath: ptr.Bool(true),
+								ForwardParams:        ptr.Bool(true),
+								ForwardPath:          ptr.Bool(true),
 								Custom404BodyPresent: ptr.Bool(true),
-								ResponseCode: ref(ResponseCodeFound),
-								ResponseURL: ptr.String("https://www.example.com"),
+								ResponseCode:         ref(ResponseCodeFound),
+								ResponseURL:          ptr.String("https://www.example.com"),
 							},
 							Security: Security{
-								HTTPSUpgrade: ptr.Bool(true),
+								HTTPSUpgrade:            ptr.Bool(true),
 								PreventForeignEmbedding: ptr.Bool(true),
-								HSTSIncludeSubDomains: ptr.Bool(true),
-								HSTSMaxAge: ptr.Int(31536000),
-								HSTSPreload: ptr.Bool(true),
+								HSTSIncludeSubDomains:   ptr.Bool(true),
+								HSTSMaxAge:              ptr.Int(31536000),
+								HSTSPreload:             ptr.Bool(true),
 							},
 							RequiredDNSEntries: RequiredDNSEntries{
 								Recommended: DNSValues{
@@ -178,7 +178,6 @@ func TestUpdateHost(t *testing.T) {
 									},
 								},
 							},
-
 						},
 						Links: Links{
 							Self: "/v1/hosts/abc-def",
@@ -193,22 +192,22 @@ func TestUpdateHost(t *testing.T) {
 				id: "b8a2287c-5580-41e8-8b8c-438231dd6875",
 				attributes: Attributes{
 					MatchOptions: MatchOptions{
-						CaseInsensitive: ptr.Bool(true),
+						CaseInsensitive:  ptr.Bool(true),
 						SlashInsensitive: ptr.Bool(true),
 					},
 					NotFoundAction: NotFoundAction{
 						ForwardParams: ptr.Bool(true),
-						ForwardPath: ptr.Bool(true),
+						ForwardPath:   ptr.Bool(true),
 						Custom404Body: ptr.String("<html><body>My Custom 404 content.</body></html>"),
-						ResponseCode: ref(ResponseCodeFound),
-						ResponseURL: ptr.String("https://www.example.com"),
+						ResponseCode:  ref(ResponseCodeFound),
+						ResponseURL:   ptr.String("https://www.example.com"),
 					},
 					Security: Security{
-						HTTPSUpgrade: ptr.Bool(true),
+						HTTPSUpgrade:            ptr.Bool(true),
 						PreventForeignEmbedding: ptr.Bool(true),
-						HSTSIncludeSubDomains: ptr.Bool(true),
-						HSTSMaxAge: ptr.Int(31536000),
-						HSTSPreload: ptr.Bool(true),
+						HSTSIncludeSubDomains:   ptr.Bool(true),
+						HSTSMaxAge:              ptr.Int(31536000),
+						HSTSPreload:             ptr.Bool(true),
 					},
 				},
 			},
@@ -231,7 +230,7 @@ func TestUpdateHost(t *testing.T) {
 			},
 			want: Want{
 				host: Host{},
-				err: "invalid_request_error: Invalid Request",
+				err:  "invalid_request_error: Invalid Request",
 			},
 		},
 	}
