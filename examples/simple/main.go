@@ -22,9 +22,9 @@ func main() {
 		ForwardPath:   ref(true),
 		ResponseType:  ref(rule.ResponseMovedPermanently),
 		SourceURLs: []string{
-			"source.nineexample.com",
+			"source.example.com",
 		},
-		TargetURL: ref("target.nineexample.com"),
+		TargetURL: ref("target.example.com"),
 	}
 
 	cr, err := e.CreateRule(rattr)
@@ -37,8 +37,8 @@ func main() {
 
 	// List rule
 	lr, err := e.ListRules(
-		easyredir.WithSourceFilter("source.nineexample.com"),
-		easyredir.WithTargetFilter("target.nineexample.com"),
+		easyredir.WithSourceFilter("source.exampe.com"),
+		easyredir.WithTargetFilter("target.example.com"),
 	)
 	if err != nil {
 		log.Fatalf("unable to list rule: %v\n", err)
@@ -50,9 +50,9 @@ func main() {
 	// Update rule
 	rattr = rule.Attributes{
 		SourceURLs: []string{
-			"sourceupdated.ninenineexample.com",
+			"sourceupdated.example.com",
 		},
-		TargetURL: ref("targetupdated.nineexample.com"),
+		TargetURL: ref("targetupdated.example.com"),
 	}
 	ur, err := e.UpdateRule(cr.Data.ID, rattr)
 	if err != nil {
