@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/alecthomas/chroma v0.10.0
+	github.com/alexflint/go-arg v1.4.3
 	github.com/goccy/go-yaml v1.9.5
 	github.com/google/uuid v1.3.0
 	github.com/gotidy/ptr v1.4.0
@@ -13,6 +14,7 @@ require (
 )
 
 require (
+	github.com/alexflint/go-scalar v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
