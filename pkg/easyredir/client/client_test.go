@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 	"github.com/stretchr/testify/assert"
@@ -96,7 +97,14 @@ func TestSendRequest(t *testing.T) {
 			},
 			want: Want{
 				body: "",
-				err:  "invalid_request_error: Invalid Request",
+				err: heredoc.Doc(`
+					invalid_request_error: Invalid Request
+					errors:
+					- resource: rule
+					  param: forward_params
+					  code: invalid_option
+					  message: Must be true or false
+				`),
 			},
 		},
 		{

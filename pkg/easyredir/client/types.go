@@ -3,6 +3,9 @@ package client
 import (
 	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/mikelorant/easyredir/pkg/structutil"
 )
 
 type Doer interface {
@@ -48,11 +51,18 @@ const (
 )
 
 func (err APIErrors) Error() string {
-	str := err.Type
+	var sb strings.Builder
+
+	fmt.Fprint(&sb, err.Type)
 	if err.Message != "" {
-		str = fmt.Sprintf("%v: %v", str, err.Message)
+		fmt.Fprintf(&sb, ": %v", err.Message)
 	}
-	return str
+	if len(err.Errors) > 0 {
+		ae, _ := structutil.Sprint(err.Errors)
+		fmt.Fprintf(&sb, "\nerrors:\n%v", ae)
+	}
+
+	return sb.String()
 }
 
 func (err RateLimitError) Error() string {
