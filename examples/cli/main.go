@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/alexflint/go-arg"
 	"github.com/mikelorant/easyredir/pkg/easyredir"
@@ -78,7 +79,7 @@ var args struct {
 
 func main() {
 	log.SetFlags(0)
-	arg.MustParse(&args)
+	p := arg.MustParse(&args)
 
 	e := easyredir.New(
 		easyredir.WithAPIKey(args.APIKey),
@@ -122,7 +123,10 @@ func main() {
 			log.Print(r)
 
 		case args.List.Rule != nil:
-			r, err := e.ListRules()
+			r, err := e.ListRules(
+				easyredir.WithSourceFilter(args.List.Rule.SourceFilter),
+				easyredir.WithTargetFilter(args.List.Rule.TargetFilter),
+			)
 			if err != nil {
 				log.Fatalf("unable to list rules: %v\n", err)
 			}
@@ -180,5 +184,8 @@ func main() {
 			}
 			fmt.Print(r)
 		}
+
+	default:
+		p.WriteHelp(os.Stdout)
 	}
 }
