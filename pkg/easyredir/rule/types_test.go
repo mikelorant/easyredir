@@ -1,11 +1,14 @@
 package rule
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/gotidy/ptr"
+	"github.com/leaanthony/go-ansi-parser"
 	"github.com/maxatome/go-testdeep/td"
 	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 )
@@ -87,7 +90,7 @@ func TestRulesStringer(t *testing.T) {
 		want string
 	}{
 		{
-			name: "minimal",
+			name: "one",
 			give: Rules{
 				Data: []Data{
 					{
@@ -99,16 +102,53 @@ func TestRulesStringer(t *testing.T) {
 			want: heredoc.Doc(`
 				id: abc-def
 				type: rule
-
-				Total: 1
 			`),
+		},
+		{
+			name: "multiple",
+			give: Rules{
+				Data: []Data{
+					{
+						ID:   "abc-def",
+						Type: "rule",
+						Attributes: Attributes{
+							SourceURLs: []string{
+								"source.example.com",
+							},
+							TargetURL: ref("target.example.com"),
+						},
+					},
+					{
+						ID:   "def-abc",
+						Type: "rule",
+						Attributes: Attributes{
+							SourceURLs: []string{
+								"source2.example.com",
+							},
+							TargetURL: ref("target2.example.com"),
+						},
+					},
+				},
+			},
+			want: heredoc.Doc(`
+				ID		SOURCE URLS			TARGET URL
+				abc-def	source.example.com	target.example.com
+				def-abc	source2.example.com	target2.example.com
+			`),
+		},
+		{
+			name: "none",
+			give: Rules{},
+			want: "No rules.",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.give
-			td.CmpString(t, got, strings.ReplaceAll(tt.want, "\t", "    "))
+			got := fmt.Sprint(tt.give)
+			got, _ = ansi.Cleanse(got)
+			re := regexp.MustCompile(`[\t\n ]`)
+			td.CmpString(t, re.ReplaceAllString(got, ""), re.ReplaceAllString(tt.want, ""))
 		})
 	}
 }

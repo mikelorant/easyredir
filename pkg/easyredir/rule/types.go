@@ -5,6 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/mikelorant/easyredir/pkg/easyredir/host"
 	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir/pkg/structutil"
@@ -66,6 +68,10 @@ const (
 	ResponseFound            ResponseType = "found"
 )
 
+const (
+	ErrNoRules = "No rules."
+)
+
 func (r Rule) String() string {
 	str, _ := structutil.Sprint(r)
 
@@ -79,14 +85,29 @@ func (r Data) String() string {
 }
 
 func (r Rules) String() string {
-	ss := []string{}
-	i := 0
-	for _, v := range r.Data {
-		ss = append(ss, fmt.Sprint(v))
-		i++
+	switch len(r.Data) {
+	case 0:
+		return ErrNoRules
+	case 1:
+		return fmt.Sprint(r.Data[0])
+	default:
+		t := table.NewWriter()
+		t.SetStyle(table.StyleColoredBright)
+		t.Style().Options.DrawBorder = false
+		t.Style().Color = table.ColorOptions{}
+		t.Style().Box.PaddingLeft = ""
+		t.Style().Box.PaddingRight = "\t"
+		t.Style().Color.Header = text.Colors{text.Bold}
+		t.AppendHeader(table.Row{"ID", "SOURCE URLS", "TARGET URL"})
+		for _, d := range r.Data {
+			t.AppendRow(table.Row{
+				d.ID,
+				strings.Join(d.Attributes.SourceURLs, "\n"),
+				*d.Attributes.TargetURL,
+			})
+		}
+		return t.Render()
 	}
-	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
-	return strings.Join(ss, "\n")
 }
 
 func ref[T any](x T) *T {

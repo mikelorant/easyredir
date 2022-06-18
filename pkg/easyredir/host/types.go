@@ -3,8 +3,9 @@ package host
 import (
 	"fmt"
 	"io"
-	"strings"
 
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir/pkg/structutil"
 )
@@ -34,7 +35,7 @@ type Attributes struct {
 	Name               string             `json:"name,omitempty"`
 	DNSStatus          DNSStatus          `json:"dns_status,omitempty"`
 	DNSTestedAt        string             `json:"dns_tested_at,omitempty"` // TODO: time.Time
-	CertificateStatus  string             `json:"certificate_status,omitempty"`
+	CertificateStatus  CertificateStatus  `json:"certificate_status,omitempty"`
 	ACMEEnabled        *bool              `json:"acme_enabled,omitempty"`
 	MatchOptions       MatchOptions       `json:"match_options,omitempty"`
 	NotFoundAction     NotFoundAction     `json:"not_found_action,omitempty"`
@@ -113,6 +114,10 @@ const (
 	CertificateStatusAAAARecordPresent          CertificateStatus = "aaaa_record_present"
 )
 
+const (
+	ErrNoHosts = "No hosts."
+)
+
 func (h Data) String() string {
 	str, _ := structutil.Sprint(h)
 
@@ -120,14 +125,29 @@ func (h Data) String() string {
 }
 
 func (h Hosts) String() string {
-	ss := []string{}
-	i := 0
-	for _, v := range h.Data {
-		ss = append(ss, fmt.Sprint(v))
-		i++
+	switch len(h.Data) {
+	case 0:
+		return ErrNoHosts
+	case 1:
+		return fmt.Sprint(h.Data[0])
+	default:
+		t := table.NewWriter()
+		t.SetStyle(table.StyleColoredBright)
+		t.Style().Options.DrawBorder = false
+		t.Style().Color = table.ColorOptions{}
+		t.Style().Box.PaddingLeft = ""
+		t.Style().Box.PaddingRight = "\t"
+		t.Style().Color.Header = text.Colors{text.Bold}
+		t.AppendHeader(table.Row{"ID", "DNS STATUS", "CERTIFICATE STATUS"})
+		for _, d := range h.Data {
+			t.AppendRow(table.Row{
+				d.ID,
+				d.Attributes.DNSStatus,
+				d.Attributes.CertificateStatus,
+			})
+		}
+		return t.Render()
 	}
-	ss = append(ss, fmt.Sprintf("Total: %v\n", i))
-	return strings.Join(ss, "\n")
 }
 
 func (h Host) String() string {
