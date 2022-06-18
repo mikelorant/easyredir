@@ -13,9 +13,9 @@ import (
 
 type CreateCmd struct {
 	Rule *struct {
-		ForwardParams *bool              `arg:"--forward-params,required"`
-		ForwardPath   *bool              `arg:"--forward-path,required"`
-		ResponseType  *rule.ResponseType `arg:"--response-type,required"`
+		ForwardParams *bool              `arg:"--forward-params" default:"false"`
+		ForwardPath   *bool              `arg:"--forward-path" default:"false"`
+		ResponseType  *rule.ResponseType `arg:"--response-type", default:"moved_permanently"`
 		SourceURLs    []string           `arg:"--source-url,required"`
 		TargetURL     *string            `arg:"--target-url,required"`
 	} `arg:"subcommand:rule"`
