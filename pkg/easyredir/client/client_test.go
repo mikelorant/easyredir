@@ -115,7 +115,7 @@ func TestSendRequest(t *testing.T) {
 			},
 			want: Want{
 				body: "",
-				err:  "received status code: 500",
+				err:  "unknown error: status code: 500",
 			},
 		},
 		{

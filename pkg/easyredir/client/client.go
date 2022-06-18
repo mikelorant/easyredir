@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,8 @@ import (
 	"github.com/mikelorant/easyredir/pkg/easyredir/option"
 	"github.com/mikelorant/easyredir/pkg/jsonutil"
 )
+
+var ErrUnknown = errors.New("unknown error")
 
 func New(opts ...option.Option) *Client {
 	o := &option.Options{}
@@ -57,7 +60,7 @@ func (cl *Client) SendRequest(path, method string, body io.Reader) (io.ReadClose
 		if err := jsonutil.DecodeJSON(resp.Body, &apiErr); err == nil {
 			return nil, apiErr
 		}
-		return nil, fmt.Errorf("received status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("%w: status code: %d", ErrUnknown, resp.StatusCode)
 	}
 
 	return resp.Body, nil
