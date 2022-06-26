@@ -44,7 +44,7 @@ type RemoveCmd struct {
 type UpdateCmd struct {
 	Host *struct {
 		ID                      string             `arg:"positional"`
-		CaseInsensitive         *bool              `arg:"--case-insenstive"`
+		CaseInsensitive         *bool              `arg:"--case-insensitive"`
 		SlashInsensitive        *bool              `arg:"--slash-insensitive"`
 		ForwardParams           *bool              `arg:"--forward-params"`
 		ForwardPath             *bool              `arg:"--forward-path"`
