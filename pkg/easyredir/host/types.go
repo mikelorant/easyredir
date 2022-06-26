@@ -63,11 +63,11 @@ type NotFoundAction struct {
 }
 
 type Security struct {
-	HTTPSUpgrade            *bool `json:"https_upgrade"`
-	PreventForeignEmbedding *bool `json:"prevent_foreign_embedding"`
-	HSTSIncludeSubDomains   *bool `json:"hsts_include_sub_domains"`
-	HSTSMaxAge              *int  `json:"hsts_max_age"`
-	HSTSPreload             *bool `json:"hsts_preload"`
+	HTTPSUpgrade            *bool `json:"https_upgrade,omitempty"`
+	PreventForeignEmbedding *bool `json:"prevent_foreign_embedding,omitempty"`
+	HSTSIncludeSubDomains   *bool `json:"hsts_include_sub_domains,omitempty"`
+	HSTSMaxAge              *int  `json:"hsts_max_age,omitempty"`
+	HSTSPreload             *bool `json:"hsts_preload,omitempty"`
 }
 
 type RequiredDNSEntries struct {
