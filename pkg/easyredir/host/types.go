@@ -96,7 +96,7 @@ const (
 const (
 	ResponseCodeMovedPermanently ResponseCode = 301
 	ResponseCodeFound            ResponseCode = 302
-	ResponseCodeNotFound         ResponseCode = 401
+	ResponseCodeNotFound         ResponseCode = 404
 )
 
 const (
